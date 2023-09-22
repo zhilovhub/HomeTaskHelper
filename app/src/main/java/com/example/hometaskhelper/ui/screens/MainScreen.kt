@@ -52,12 +52,20 @@ fun Tasks(tasks: List<Task> = listOf(
     Task("Линал", "22.09.23", "1-8 номера без букв Б", true),
     Task("История", "23.09.23", "Эссе", false),
 )) {
+    Surface(
+        modifier = Modifier.fillMaxSize().padding(top = 48.dp, start = 48.dp, end=48.dp),
+        color = MaterialTheme.colorScheme.error
+    ) {
+        LazyColumn(
 
-    LazyColumn {
-        items(tasks) {task ->
-            Task(task)
+        ) {
+            items(tasks) {task ->
+                Task(task)
+            }
         }
     }
+
+
 
 }
 

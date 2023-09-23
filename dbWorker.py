@@ -17,4 +17,5 @@ class _DataBase():
 class MainDB(_DataBase):
     pass
 
-class
+class AuthDB(_DataBase):
+    pass

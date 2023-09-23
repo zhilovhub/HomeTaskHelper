@@ -19,4 +19,3 @@ class MainDB(_DataBase):
 
 class AuthDB(_DataBase):
     pass
-    pass

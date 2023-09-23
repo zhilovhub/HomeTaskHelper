@@ -1,13 +1,17 @@
 package com.example.hometaskhelper.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,34 +52,47 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun Tasks(tasks: List<Task> = listOf(
-    Task("Матан", "21.09.23", "1-4 номера без букв А", false),
-    Task("Линал", "22.09.23", "1-8 номера без букв Б", true),
-    Task("История", "23.09.23", "Эссе", false),
+    Task("Матан", "21.09.23\n1-4 номера без букв А"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("История",  "\nЭссе"),
 )) {
     Surface(
-        modifier = Modifier.fillMaxSize().padding(top = 48.dp, start = 48.dp, end=48.dp),
-        color = MaterialTheme.colorScheme.error
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 48.dp, start = 48.dp, end = 48.dp, bottom = 96.dp)
+//        color = MaterialTheme.colorScheme.error
     ) {
         LazyColumn(
-
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(tasks) {task ->
                 Task(task)
             }
         }
     }
-
-
-
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+//@Preview
 @Composable
-fun Task(task: Task) {
+fun Task(task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
     Column {
         Text(text = task.name)
-        Text(text = task.date)
-        Text(text = task.description)
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = task.description,
+            onValueChange = {  },
+            label = {Text("Description")}
+        )
     }
 }
 

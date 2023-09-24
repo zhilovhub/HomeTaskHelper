@@ -15,7 +15,6 @@ class _DataBase():
         return base
 
 class MainDB(_DataBase):
-    simpleVar = 0
     pass
 
 class AuthDB(_DataBase):

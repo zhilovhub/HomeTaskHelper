@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,7 +34,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(top = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -45,6 +45,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center
             )
             Tasks()
+            RedactTasks()
         }
     }
 }
@@ -58,15 +59,14 @@ fun Tasks(tasks: List<Task> = listOf(
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("История",  "\nЭссе"),
 )) {
     Surface(
         modifier = Modifier
-            .fillMaxSize()
             .padding(top = 48.dp, start = 48.dp, end = 48.dp, bottom = 96.dp)
 //        color = MaterialTheme.colorScheme.error
     ) {
@@ -77,6 +77,17 @@ fun Tasks(tasks: List<Task> = listOf(
                 Task(task)
             }
         }
+    }
+}
+
+
+@Preview
+@Composable
+fun RedactTasks() {
+    Button(
+        onClick = {  }
+    ) {
+        Text("Добавить")
     }
 }
 

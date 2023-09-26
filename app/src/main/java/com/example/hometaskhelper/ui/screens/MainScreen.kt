@@ -2,6 +2,7 @@ package com.example.hometaskhelper.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,13 +81,26 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
 @Preview
 @Composable
 fun RedactTasks(modifier: Modifier = Modifier) {
-    Button(
-        modifier = modifier,
-        onClick = {  }
+    Row(
+        modifier = modifier
     ) {
-        Text("Добавить")
+        Button(
+            modifier = Modifier,
+            onClick = { }
+        ) {
+            Text("Добавить")
+        }
+        Button(
+            modifier = Modifier,
+            onClick = { }
+        ) {
+            Text("Удалить")
+        }
     }
 }
+
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

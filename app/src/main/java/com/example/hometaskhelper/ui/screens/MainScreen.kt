@@ -52,7 +52,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun Tasks(tasks: List<Task> = listOf(
+fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
     Task("Матан", "21.09.23\n1-4 номера без букв А"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
@@ -65,17 +65,12 @@ fun Tasks(tasks: List<Task> = listOf(
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("История",  "\nЭссе"),
 )) {
-    Surface(
-        modifier = Modifier
-            .padding(top = 48.dp, start = 48.dp, end = 48.dp, bottom = 96.dp)
-//        color = MaterialTheme.colorScheme.error
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(tasks) {task ->
-                Task(task)
-            }
+        items(tasks) {task ->
+            Task(task = task)
         }
     }
 }
@@ -83,8 +78,9 @@ fun Tasks(tasks: List<Task> = listOf(
 
 @Preview
 @Composable
-fun RedactTasks() {
+fun RedactTasks(modifier: Modifier = Modifier) {
     Button(
+        modifier = modifier,
         onClick = {  }
     ) {
         Text("Добавить")
@@ -95,8 +91,10 @@ fun RedactTasks() {
 @OptIn(ExperimentalMaterial3Api::class)
 //@Preview
 @Composable
-fun Task(task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
-    Column {
+fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
+    Column(
+        modifier = modifier
+    ) {
         Text(text = task.name)
         TextField(
             modifier = Modifier.fillMaxWidth(),

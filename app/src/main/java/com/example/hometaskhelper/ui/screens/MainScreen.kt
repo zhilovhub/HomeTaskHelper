@@ -1,5 +1,6 @@
 package com.example.hometaskhelper.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,12 +19,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hometaskhelper.R
 import com.example.hometaskhelper.ui.models.Task
 import com.example.hometaskhelper.ui.theme.HomeTaskHelperTheme
 
@@ -49,6 +52,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             Tasks()
             RedactTasks()
         }
+        AcceptCancel()
     }
 }
 
@@ -100,7 +104,21 @@ fun RedactTasks(modifier: Modifier = Modifier) {
 }
 
 
-
+@Composable
+fun AcceptCancel(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+    ) {
+        Image(
+            painter = painterResource(R.drawable.baseline_check_circle_24),
+            contentDescription = null
+        )
+        Image(
+            painter = painterResource(R.drawable.baseline_cancel_24),
+            contentDescription = null
+        )
+    }
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

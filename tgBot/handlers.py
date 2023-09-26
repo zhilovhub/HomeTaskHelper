@@ -12,6 +12,8 @@ class Register(StatesGroup):
 
 @r.message(Command("start"))
 async def start(msg: types.Message, state: FSMContext):
+    if msg.from_user.id in []:#must be search in list of all user id's
+        return
     await msg.answer("Введите ключ доступа")
     await state.set_state(Register.waitingForKey)
 

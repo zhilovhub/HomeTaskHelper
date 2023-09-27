@@ -134,16 +134,27 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 //@Preview
 @Composable
 fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
-    Column(
+    Surface(
         modifier = modifier
     ) {
-        Text(text = task.name)
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = task.description,
-            onValueChange = {  },
-            label = {Text("Description")}
-        )
+        Column(
+        ) {
+            Text(text = task.name)
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = task.description,
+                onValueChange = {  },
+                label = {Text("Description")}
+            )
+        }
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = null
+            )
+        }
     }
 }
 

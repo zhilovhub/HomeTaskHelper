@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -109,14 +110,22 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
     ) {
-        Image(
-            painter = painterResource(R.drawable.baseline_check_circle_24),
-            contentDescription = null
-        )
-        Image(
-            painter = painterResource(R.drawable.baseline_cancel_24),
-            contentDescription = null
-        )
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_check_circle_24),
+                contentDescription = null
+            )
+        }
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_cancel_24),
+                contentDescription = null
+            )
+        }
     }
 }
 

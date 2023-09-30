@@ -1,7 +1,11 @@
 package com.example.hometaskhelper.database.entities
 
-class User {
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
-
-}
+@Entity
+data class User(
+    @PrimaryKey
+    val id: Int
+)

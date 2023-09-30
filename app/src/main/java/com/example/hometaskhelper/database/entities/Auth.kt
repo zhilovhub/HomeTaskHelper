@@ -1,7 +1,11 @@
 package com.example.hometaskhelper.database.entities
 
-class Auth {
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
-
-}
+@Entity
+data class Auth(
+    @PrimaryKey
+    val id: Int
+)

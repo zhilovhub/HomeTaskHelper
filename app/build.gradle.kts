@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -51,10 +51,19 @@ android {
 }
 
 dependencies {
+    val roomVersion = "2.5.2"
+
+    // room
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+
+    // To use Kotlin Symbol Processing (KSP)
+    ksp("androidx.room:room-compiler:$roomVersion")
+
 
     // dagger
     implementation("com.google.dagger:dagger:2.48")
-    kapt("com.google.dagger:dagger-compiler:2.48")
+    ksp("com.google.dagger:dagger-compiler:2.48")
 
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

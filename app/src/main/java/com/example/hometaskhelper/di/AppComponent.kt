@@ -1,11 +1,14 @@
 package com.example.hometaskhelper.di
 
+import com.example.hometaskhelper.network.SQLApi
 import dagger.Component
-import retrofit2.Retrofit
+import javax.inject.Singleton
 
-@Component
+@Component(modules = [AppModule::class])
+@Singleton
 interface AppComponent {
 
-    fun getSQLApi(): Retrofit
+    @Singleton
+    fun SQLApi(): SQLApi
 
 }

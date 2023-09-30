@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,7 +84,6 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
 }
 
 
-@Preview
 @Composable
 fun RedactTasks(modifier: Modifier = Modifier) {
     Row(
@@ -131,21 +131,27 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-//@Preview
 @Composable
 fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
     Surface(
         modifier = modifier
     ) {
-        Column(
-        ) {
+        Column {
             Text(text = task.name)
-            TextField(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                value = task.description,
-                onValueChange = {  },
-                label = {Text("Description")}
-            )
+                horizontalArrangement = Arrangement.Center
+            ) {
+                TextField(
+                    value = task.description,
+                    onValueChange = { },
+                    label = { Text("Description") }
+                )
+                Checkbox(
+                    checked = false,
+                    onCheckedChange = {  }
+                )
+            }
         }
         IconButton(
             onClick = {  }

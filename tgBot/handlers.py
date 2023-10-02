@@ -6,7 +6,7 @@ import dbWorker
 from aiogram.fsm.state import StatesGroup, State
 
 r = Router()
-db = dbWorker.DataBase()
+db = dbWorker.MainDB("../db.db")
 class Register(StatesGroup):
     waitingForKey = State()
 
@@ -15,6 +15,6 @@ async def start(msg: types.Message, state: FSMContext):
     await msg.answer("Введите ключ доступа")
     await state.set_state(Register.waitingForKey)
 
-@r.message(state=Register.waitingForKey)
+@r.message(Register.waitingForKey)
 async def addUser(message: types.Message, state: FSMContext):
     pass

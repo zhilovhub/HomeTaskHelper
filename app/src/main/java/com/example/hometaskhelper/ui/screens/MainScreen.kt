@@ -2,6 +2,7 @@ package com.example.hometaskhelper.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,22 +40,28 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .padding(top = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "HomeTasks",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                textAlign = TextAlign.Center
+            Column(
+                modifier = Modifier
+                    .padding(top = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "HomeTasks",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center
+                )
+                Tasks()
+                RedactTasks()
+            }
+            AcceptCancel(
+                modifier = Modifier.align(Alignment.TopEnd)
             )
-            Tasks()
-            RedactTasks()
         }
-        AcceptCancel()
     }
 }
 
@@ -143,24 +150,28 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                TextField(
-                    value = task.description,
-                    onValueChange = { },
-                    label = { Text("Description") }
-                )
+                Box {
+                    TextField(
+                        value = task.description,
+                        onValueChange = { },
+                        label = { Text("Description") }
+                    )
+                    IconButton(
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        onClick = {  }
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.baseline_delete_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+
                 Checkbox(
                     checked = false,
                     onCheckedChange = {  }
                 )
             }
-        }
-        IconButton(
-            onClick = {  }
-        ) {
-            Image(
-                painter = painterResource(R.drawable.baseline_delete_24),
-                contentDescription = null
-            )
         }
     }
 }

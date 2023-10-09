@@ -8,4 +8,4 @@ WEBHOOK_SECRET = ""
 # Base URL for webhook will be used to generate webhook URL for Telegram,
 # in this example it is used public DNS with HTTPS support
 BASE_WEBHOOK_URL = ""
-DB_PATH = ""
+DB_PATH = "../db.db"

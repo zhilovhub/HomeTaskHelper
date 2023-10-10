@@ -1,7 +1,6 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.domain.database.DatabaseDao
-import com.example.hometaskhelper.domain.network.SQLApi
+import com.example.hometaskhelper.domain.AppRepository
 import dagger.Component
 import javax.inject.Singleton
 
@@ -10,9 +9,6 @@ import javax.inject.Singleton
 interface AppComponent {
 
     @Singleton
-    fun SQLApi(): SQLApi
-
-    @Singleton
-    fun databaseDao(): DatabaseDao
+    fun repository(): AppRepository
 
 }

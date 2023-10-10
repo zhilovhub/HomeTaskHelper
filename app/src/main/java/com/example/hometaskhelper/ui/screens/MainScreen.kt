@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -55,7 +57,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     fontFamily = FontFamily.SansSerif,
                     textAlign = TextAlign.Center
                 )
-                Tasks()
+                Tasks(
+                    modifier = Modifier.weight(1f)
+                )
                 RedactTasks()
             }
             AcceptCancel(
@@ -70,10 +74,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
     Task("Матан", "21.09.23\n1-4 номера без букв А"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Физ-ра",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Физика",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Инфа",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Алгы",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
@@ -81,7 +85,7 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
     Task("История",  "\nЭссе"),
 )) {
     LazyColumn(
-        modifier = modifier.height(470.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tasks) {task ->
@@ -94,7 +98,7 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
 @Composable
 fun RedactTasks(modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier
+        modifier = modifier.padding(top = 36.dp, bottom = 24.dp),
     ) {
 
         Button(
@@ -103,6 +107,9 @@ fun RedactTasks(modifier: Modifier = Modifier) {
         ) {
             Text("Добавить")
         }
+        Spacer(
+            modifier = Modifier.width(24.dp)
+        )
         Button(
             modifier = Modifier,
             onClick = { }
@@ -116,7 +123,7 @@ fun RedactTasks(modifier: Modifier = Modifier) {
 @Composable
 fun AcceptCancel(modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier
+        modifier = modifier,
     ) {
         IconButton(
             onClick = {  }
@@ -144,33 +151,40 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
     Surface(
         modifier = modifier
     ) {
-        Column {
-            Text(text = task.name)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box {
-                    TextField(
-                        value = task.description,
-                        onValueChange = { },
-                        label = { Text("Description") }
-                    )
-                    IconButton(
-                        modifier = Modifier.align(Alignment.TopEnd),
-                        onClick = {  }
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.baseline_delete_24),
-                            contentDescription = null
-                        )
-                    }
-                }
-
-                Checkbox(
-                    checked = false,
-                    onCheckedChange = {  }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Column {
+                Text(
+                    text = task.name,
+                    fontWeight = FontWeight.Bold
                 )
+                Row {
+                    val finished = listOf("Физика", "Линал", "Инфа").contains(task.name)
+                    Box {
+                        TextField(
+                            enabled = !finished,
+                            value = task.description,
+                            onValueChange = { },
+                            label = { Text("Description") }
+                        )
+                        IconButton(
+                            modifier = Modifier.align(Alignment.TopEnd),
+                            onClick = {  }
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.baseline_delete_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    Checkbox(
+                        modifier = Modifier.align(Alignment.Top),
+                        checked = finished,
+                        onCheckedChange = {  }
+                    )
+                }
             }
         }
     }

@@ -22,11 +22,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -148,6 +151,8 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
+    val taskDescription = remember { mutableStateOf(task.description) }
+
     Surface(
         modifier = modifier
     ) {
@@ -164,10 +169,11 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
                     val finished = listOf("Физика", "Линал", "Инфа").contains(task.name)
                     Box {
                         TextField(
+                            value = taskDescription.value,
                             enabled = !finished,
-                            value = task.description,
-                            onValueChange = { },
-                            label = { Text("Description") }
+                            onValueChange = {
+                                taskDescription.value = it
+                            }
                         )
                         IconButton(
                             modifier = Modifier.align(Alignment.TopEnd),

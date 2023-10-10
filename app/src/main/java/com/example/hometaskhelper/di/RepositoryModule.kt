@@ -1,8 +1,8 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.domain.repository.AppRepository
-import com.example.hometaskhelper.domain.database.DatabaseDao
-import com.example.hometaskhelper.domain.network.SQLApi
+import com.example.hometaskhelper.data.repositories.AppRepository
+import com.example.hometaskhelper.data.datasources.database.DatabaseDao
+import com.example.hometaskhelper.data.datasources.network.SQLApi
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

@@ -2,8 +2,8 @@ package com.example.hometaskhelper.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.hometaskhelper.domain.database.AppDatabase
-import com.example.hometaskhelper.domain.database.DatabaseDao
+import com.example.hometaskhelper.data.datasources.database.AppDatabase
+import com.example.hometaskhelper.data.datasources.database.DatabaseDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

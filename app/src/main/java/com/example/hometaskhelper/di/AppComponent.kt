@@ -1,6 +1,6 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.domain.repository.AppRepository
+import com.example.hometaskhelper.data.repositories.AppRepository
 import dagger.Component
 import javax.inject.Singleton
 

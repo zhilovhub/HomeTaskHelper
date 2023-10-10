@@ -1,4 +1,4 @@
-package com.example.hometaskhelper.domain.database.entities
+package com.example.hometaskhelper.data.datasources.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

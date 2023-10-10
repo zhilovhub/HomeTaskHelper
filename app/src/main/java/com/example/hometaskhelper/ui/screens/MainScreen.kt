@@ -63,7 +63,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 Tasks(
                     modifier = Modifier.weight(1f)
                 )
-                RedactTasks()
+                RedactTasks(UserState.DEFAULT)
             }
             AcceptCancel(
                 modifier = Modifier.align(Alignment.TopEnd)
@@ -92,14 +92,14 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tasks) {task ->
-            Task(task = task)
+            Task(task = task, userState = UserState.DEFAULT)
         }
     }
 }
 
 
 @Composable
-fun RedactTasks(modifier: Modifier = Modifier) {
+fun RedactTasks(userState: UserState, modifier: Modifier = Modifier, ) {
     Row(
         modifier = modifier.padding(top = 36.dp, bottom = 24.dp),
     ) {
@@ -150,7 +150,9 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false)) {
+fun Task(modifier: Modifier = Modifier,
+         task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false),
+         userState: UserState) {
     val taskDescription = remember { mutableStateOf(task.description) }
     val taskFinished = remember { mutableStateOf(task.finished) }
 
@@ -175,14 +177,16 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
                                 taskDescription.value = it
                             }
                         )
-                        IconButton(
-                            modifier = Modifier.align(Alignment.TopEnd),
-                            onClick = {  }
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.baseline_delete_24),
-                                contentDescription = null
-                            )
+                        if (userState == UserState.DELETING) {
+                            IconButton(
+                                modifier = Modifier.align(Alignment.TopEnd),
+                                onClick = {  }
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.baseline_delete_24),
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                     Checkbox(
@@ -202,4 +206,11 @@ fun HomeScreenPreview() {
     HomeTaskHelperTheme {
         HomeScreen()
     }
+}
+
+
+enum class UserState {
+    DEFAULT,
+    REDACTING,
+    DELETING
 }

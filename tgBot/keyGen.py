@@ -4,8 +4,8 @@ from Crypto.Hash import keccak
 import random
 from string import digits,ascii_lowercase,ascii_uppercase
 alph = digits+ascii_uppercase+ascii_lowercase
-
-def generateKeys(n): # -> list[str] - hashes
+logging.basicConfig(level=logging.INFO)
+def generateKeys(n: int): # -> list[str] - hashes
     hl = []; kl = []
     for i in range(n):
         val = "".join([alph[random.randint(0,26+26+9)] for x in range(256)])

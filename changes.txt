@@ -4,3 +4,7 @@ TGbot KeyGen&Handlers update
 2. Registration is ready-to-use except adding user to DataBase
 3. Minor Changes applied to Auth, Users tables, OneTimeKeys table added
 4. Better Logging
+
+TGbot registration&login update
+1. dbWorker updated
+2. All reg&login handlers are working properly

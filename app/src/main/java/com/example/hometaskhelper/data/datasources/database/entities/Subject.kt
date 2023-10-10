@@ -1,18 +1,11 @@
 package com.example.hometaskhelper.data.datasources.database.entities
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity
-data class User(
+data class Subject(
     @PrimaryKey
     val id: Int,
-
-    @ColumnInfo(name = "tg_id")
-    val tdId: Int,
-
-    @ColumnInfo(name = "finished_tasks")
-    val finishedTasks: String
+    val name: String
 )

@@ -75,17 +75,17 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
-    Task("Матан", "21.09.23\n1-4 номера без букв А"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Физ-ра",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Физика",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Инфа",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Алгы",  "22.09.23\n1-8 номера без букв Б"),
+    Task("Матан", "21.09.23\n1-4 номера без букв А", false),
+    Task("Линал",  "22.09.23\n1-8 номера без букв Б", true),
+    Task("Физ-ра",  "22.09.23\n1-8 номера без букв Б", false),
+    Task("Физика",  "22.09.23\n1-8 номера без букв Б", false),
+    Task("Инфа",  "22.09.23\n1-8 номера без букв Б", true),
+    Task("Алгы",  "22.09.23\n1-8 номера без букв Б", false),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("История",  "\nЭссе"),
+    Task("История",  "\nЭссе", false),
 )) {
     LazyColumn(
         modifier = modifier,
@@ -150,8 +150,9 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
+fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false)) {
     val taskDescription = remember { mutableStateOf(task.description) }
+    val taskFinished = remember { mutableStateOf(task.finished) }
 
     Surface(
         modifier = modifier
@@ -166,11 +167,10 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
                     fontWeight = FontWeight.Bold
                 )
                 Row {
-                    val finished = listOf("Физика", "Линал", "Инфа").contains(task.name)
                     Box {
                         TextField(
                             value = taskDescription.value,
-                            enabled = !finished,
+                            enabled = !taskFinished.value,
                             onValueChange = {
                                 taskDescription.value = it
                             }
@@ -187,8 +187,8 @@ fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.2
                     }
                     Checkbox(
                         modifier = Modifier.align(Alignment.Top),
-                        checked = finished,
-                        onCheckedChange = {  }
+                        checked = taskFinished.value,
+                        onCheckedChange = { taskFinished.value = !taskFinished.value }
                     )
                 }
             }

@@ -1,16 +1,12 @@
 package com.example.hometaskhelper.data.datasources.network
 
+import com.example.hometaskhelper.data.datasources.SQLAccess
+import com.example.hometaskhelper.data.datasources.database.entities.Task
 import retrofit2.http.POST
 
 
-interface SQLApi {
+interface SQLApi : SQLAccess {
     @POST
-    suspend fun createAuthTable()
-
-    @POST
-    suspend fun createTasksTable()
-
-    @POST
-    suspend fun createUsersTable()
+    override fun createAuthTable(entity: Task)
 
 }

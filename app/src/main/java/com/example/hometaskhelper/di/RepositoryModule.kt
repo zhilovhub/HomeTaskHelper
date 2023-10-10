@@ -1,6 +1,6 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.domain.AppRepository
+import com.example.hometaskhelper.domain.repository.AppRepository
 import com.example.hometaskhelper.domain.database.DatabaseDao
 import com.example.hometaskhelper.domain.network.SQLApi
 import dagger.Module

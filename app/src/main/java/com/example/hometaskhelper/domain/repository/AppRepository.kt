@@ -1,4 +1,4 @@
-package com.example.hometaskhelper.domain
+package com.example.hometaskhelper.domain.repository
 
 import com.example.hometaskhelper.domain.database.DatabaseDao
 import com.example.hometaskhelper.domain.network.SQLApi

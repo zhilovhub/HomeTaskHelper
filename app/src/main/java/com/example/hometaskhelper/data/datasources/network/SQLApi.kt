@@ -7,6 +7,6 @@ import retrofit2.http.POST
 
 interface SQLApi : SQLAccess {
     @POST
-    override fun createAuthTable(entity: Task)
+    override suspend fun createAuthTable(entity: Task)
 
 }

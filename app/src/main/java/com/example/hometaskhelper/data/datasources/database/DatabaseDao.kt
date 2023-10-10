@@ -8,5 +8,5 @@ import com.example.hometaskhelper.data.datasources.database.entities.Task
 @Dao
 interface DatabaseDao : SQLAccess {
     @Insert
-    override fun createAuthTable(entity: Task)
+    override suspend fun createAuthTable(entity: Task)
 }

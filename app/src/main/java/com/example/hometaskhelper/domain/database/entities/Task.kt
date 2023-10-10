@@ -1,11 +1,11 @@
-package com.example.hometaskhelper.database.entities
+package com.example.hometaskhelper.domain.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
 @Entity
-data class Auth(
+data class Task(
     @PrimaryKey
     val id: Int
 )

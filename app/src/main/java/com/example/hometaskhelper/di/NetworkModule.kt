@@ -1,6 +1,6 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.network.SQLApi
+import com.example.hometaskhelper.domain.network.SQLApi
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit

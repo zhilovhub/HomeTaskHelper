@@ -1,4 +1,4 @@
-package com.example.hometaskhelper.database
+package com.example.hometaskhelper.domain.database
 
 import androidx.room.Dao
 

@@ -1,4 +1,4 @@
-package com.example.hometaskhelper.network
+package com.example.hometaskhelper.domain.network
 
 import retrofit2.http.POST
 

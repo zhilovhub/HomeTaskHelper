@@ -12,7 +12,7 @@ class dataBaseWorker():
         self.createTables()
         self.USERNAME = 1
         self.TG_ID = 0
-        self.writeOneTimeKeys()
+        # self.writeOneTimeKeys()
     def connectBase(self):
         try:
             logging.log(20,"Trying to connect to db")
@@ -30,12 +30,16 @@ class dataBaseWorker():
                     user_name TEXT, 
                     tg_id INTEGER, 
                     password TEXT)""")
+        cur.execute("CREATE TABLE IF NOT EXISTS Subjects (id INTEGER PRIMARY KEY AUTOINCREMENT, subject_name TEXT, aliases LIST)")
+        # cur.execute("DROP TABLE Tasks")
         cur.execute("""CREATE TABLE IF NOT EXISTS Tasks 
                     (num INTEGER PRIMARY KEY AUTOINCREMENT, 
-                    title TEXT, 
-                    desription TEXT, 
-                    datetime DATE, 
-                    is_redacting BOOLEAN)""")
+                    subject_id INTEGER, 
+                    description TEXT, 
+                    from_date DATE,
+                    to_date TEXT, 
+                    is_redacting BOOLEAN,
+                    FOREIGN KEY (subject_id) REFERENCES Subjects (id))""")
         cur.execute("""CREATE TABLE IF NOT EXISTS Users 
                     (num INTEGER PRIMARY KEY AUTOINCREMENT, 
                     user_name TEXT, 
@@ -53,7 +57,7 @@ class dataBaseWorker():
         return reply
     def isUserTG(self, tg_id:int): # -> boolean
         base, cur = self.connectBase()
-        print([i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()])
+        # print([i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()])
         reply = True if tg_id in [i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()] else False
         cur.close(); base.close()
         logging.log(20, "Checked user for existance by tg_id")
@@ -64,9 +68,13 @@ class dataBaseWorker():
         cur.execute("INSERT INTO Auth (user_name, tg_id, password) VALUES (?, ?, ?)", (userName, tg_id, keyGen.getHash(key)))
         cur.close(); base.commit(); base.close()
         logging.log(20,"Added new User")
-    def addTask(self, title: str, description: str):
+    def addTask(self, data: list):
         base, cur = self.connectBase()
-        cur.execute("INSERT INTO Tasks (title, description) VALUES (?, ?)", (title, description))
+        aliases = self.getSubjectIDsAndAliases()
+        for i in aliases:
+            if data[0] in i:data[0]=i[0]
+        print(data[0])
+        cur.execute("INSERT INTO Tasks (subject_id, to_date, description) VALUES (?, ?, ?)", data)
         cur.close(); base.commit(); base.close()
         logging.log(20,"Added new task")
     def writeOneTimeKeys(self):
@@ -87,9 +95,10 @@ class dataBaseWorker():
         return isValid
     def checkPassword(self, userName, password: str):# -> boolean
         base, cur = self.connectBase()
-        print([i[0] for i in cur.execute("SELECT password FROM Auth WHERE user_name = ?", (userName,)).fetchall()])
+        # print([i[0] for i in cur.execute("SELECT password FROM Auth WHERE user_name = ?", (userName,)).fetchall()])
         isValid = True if keyGen.getHash(password) in [i[0] for i in cur.execute("SELECT password FROM Auth WHERE user_name = ?", (userName,)).fetchall()] else False
         cur.close(); base.close()
+        logging.log(20,"Password checked succesfully")
         return isValid
     def delOneTimeKey(self, key: str):
         base, cur = self.connectBase()
@@ -102,3 +111,35 @@ class dataBaseWorker():
         cur.execute(f"UPDATE Auth SET tg_id = ? WHERE user_name = ?",(tg_id, userName))
         logging.log(20, "Added tg_id to existing user")
         cur.close(); base.commit(); base.close()
+    def addSub(self,name):
+        base, cur = self.connectBase()
+        cur.execute("INSERT INTO Subjects (subject_name, aliases) VALUES (?, ?)",(name,json.dumps(name)))
+        cur.close(); base.commit(); base.close()
+        logging.log(20,"New subject added")
+    def delSubByID(self,ID):
+        base, cur = self.connectBase()
+        cur.execute("DELETE FROM Subjects WHERE id = ?", (ID,))
+        cur.close(); base.commit(); base.close()
+        logging.log(20,"Subject deleted")
+    def getSubjectsAliases(self):
+        base, cur = self.connectBase()
+        raw_subs = [i[0] for i in cur.execute("SELECT aliases FROM Subjects").fetchall()]
+        subs = []
+        for i in raw_subs:
+            for a in i:
+                subs.append(a)
+        cur.close(); base.commit(); base.close()
+        logging.log(20,"Fetched all aliases from subject")
+        return subs
+    def getSubjectNames(self):
+        base, cur = self.connectBase()
+        subs = [i[0] for i in cur.execute("SELECT subject_name FROM Subjects").fetchall()]
+        cur.close(); base.commit(); base.close()
+        logging.log(20,"Fetched subject_name's")
+        return subs
+    def getSubjectIDsAndAliases(self):
+        base, cur = self.connectBase()
+        subs = cur.execute("SELECT id,aliases FROM Subjects").fetchall()
+        cur.close(); base.commit(); base.close()
+        logging.log(20, "Fetched subject_name's & aliases")
+        return subs

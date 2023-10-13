@@ -13,7 +13,7 @@ class NetworkModule {
     @Singleton
     fun provideRetrofitBuilder(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("https://asdads.com")
             .build()
     }
 

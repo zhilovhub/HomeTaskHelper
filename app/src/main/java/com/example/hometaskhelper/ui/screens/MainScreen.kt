@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,6 +42,8 @@ import com.example.hometaskhelper.ui.theme.HomeTaskHelperTheme
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val userState = remember { mutableStateOf(UserState.DEFAULT) }
+
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -61,20 +64,24 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center
                 )
                 Tasks(
+                    userState = userState,
                     modifier = Modifier.weight(1f)
                 )
-                RedactTasks(UserState.DEFAULT)
+                RedactTasks(userState = userState)
             }
-            AcceptCancel(
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
+            if (userState.value != UserState.DEFAULT) {
+                AcceptCancel(
+                    userState = userState,
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
+            }
         }
     }
 }
 
 
 @Composable
-fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
+fun Tasks(userState: MutableState<UserState>, modifier: Modifier = Modifier, tasks: List<Task> = listOf(
     Task("Матан", "21.09.23\n1-4 номера без букв А", false),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б", true),
     Task("Физ-ра",  "22.09.23\n1-8 номера без букв Б", false),
@@ -87,26 +94,33 @@ fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
 //    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("История",  "\nЭссе", false),
 )) {
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tasks) {task ->
-            Task(task = task, userState = UserState.DEFAULT)
+            Task(task = task, userState = userState)
         }
     }
 }
 
 
 @Composable
-fun RedactTasks(userState: UserState, modifier: Modifier = Modifier, ) {
+fun RedactTasks(userState: MutableState<UserState>, modifier: Modifier = Modifier) {
+    val buttonsEnabled = when (userState.value) {
+        UserState.DELETING -> false
+        else -> true
+    }
+
     Row(
         modifier = modifier.padding(top = 36.dp, bottom = 24.dp),
     ) {
 
         Button(
             modifier = Modifier,
-            onClick = { }
+            enabled = buttonsEnabled,
+            onClick = {  }
         ) {
             Text("Добавить")
         }
@@ -115,7 +129,10 @@ fun RedactTasks(userState: UserState, modifier: Modifier = Modifier, ) {
         )
         Button(
             modifier = Modifier,
-            onClick = { }
+            enabled = buttonsEnabled,
+            onClick = {
+                userState.value = UserState.DELETING
+            }
         ) {
             Text("Удалить")
         }
@@ -124,12 +141,16 @@ fun RedactTasks(userState: UserState, modifier: Modifier = Modifier, ) {
 
 
 @Composable
-fun AcceptCancel(modifier: Modifier = Modifier) {
+fun AcceptCancel(userState: MutableState<UserState>, modifier: Modifier = Modifier) {
+    val changeStateToDefault = {
+        userState.value = UserState.DEFAULT
+    }
+
     Row(
         modifier = modifier,
     ) {
         IconButton(
-            onClick = {  }
+            onClick = changeStateToDefault
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_check_circle_24),
@@ -137,7 +158,7 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
             )
         }
         IconButton(
-            onClick = {  }
+            onClick = changeStateToDefault
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_cancel_24),
@@ -150,9 +171,9 @@ fun AcceptCancel(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Task(modifier: Modifier = Modifier,
-         task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false),
-         userState: UserState) {
+fun Task(userState: MutableState<UserState>,
+         modifier: Modifier = Modifier,
+         task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false)) {
     val taskDescription = remember { mutableStateOf(task.description) }
     val taskFinished = remember { mutableStateOf(task.finished) }
 
@@ -177,7 +198,7 @@ fun Task(modifier: Modifier = Modifier,
                                 taskDescription.value = it
                             }
                         )
-                        if (userState == UserState.DELETING) {
+                        if (userState.value == UserState.DELETING) {
                             IconButton(
                                 modifier = Modifier.align(Alignment.TopEnd),
                                 onClick = {  }

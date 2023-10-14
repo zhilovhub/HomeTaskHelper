@@ -31,7 +31,7 @@ data class Task(
     @ColumnInfo(name = "to_date")
     val toDate: String,
 
-    @ColumnInfo(name = "is_redacting")
+    @ColumnInfo(name = "is_redacting", defaultValue = "false")
     val isRedacting: Boolean
 ) {
     companion object {

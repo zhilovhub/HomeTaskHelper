@@ -10,7 +10,7 @@ import com.example.hometaskhelper.data.datasources.database.entities.User
 
 @Database(
     entities = [Auth::class, Task::class, User::class, Subject::class, OneTimeKey::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

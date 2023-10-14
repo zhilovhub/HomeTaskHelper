@@ -32,7 +32,10 @@ data class Task(
     val toDate: String,
 
     @ColumnInfo(name = "is_redacting", defaultValue = "false")
-    val isRedacting: Boolean
+    val isRedacting: Boolean,
+
+    @ColumnInfo(name = "is_finished", defaultValue = "false")
+    val isFinished: Boolean,
 ) {
     companion object {
         const val TABLE_NAME = "Tasks"

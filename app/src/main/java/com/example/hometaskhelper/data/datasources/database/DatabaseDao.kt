@@ -22,11 +22,8 @@ interface DatabaseDao : SQLAccess {
     @Delete
     override suspend fun deleteUser(user: User)
 
-    @Query("SELECT finished_tasks FROM User WHERE id = :id")
+    @Query("SELECT finished_tasks FROM ${User.TABLE_NAME} WHERE id = :id")
     override suspend fun getUserFinishedTasks(id: Int): String
-
-    @Query("SELECT tg_id FROM User WHERE id = :id")
-    override suspend fun getUserTgId(id: Int): Int
 
     @Insert
     override suspend fun addSubject(subject: Subject)
@@ -37,10 +34,10 @@ interface DatabaseDao : SQLAccess {
     @Delete
     override suspend fun deleteSubject(subject: Subject)
 
-    @Query("SELECT * FROM Subject WHERE id = :id")
+    @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
     override suspend fun getSubjectById(id: Int): Subject
 
-    @Query("SELECT * FROM Subject WHERE id = :id")
+    @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
     override suspend fun getSubjectByName(id: Int): Subject
 
     @Insert
@@ -52,9 +49,9 @@ interface DatabaseDao : SQLAccess {
     @Delete
     override suspend fun deleteTask(task: Task)
 
-    @Query("SELECT * FROM Task WHERE id = :id")
+    @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE id = :id")
     override suspend fun getTaskById(id: Int): Task
 
-    @Query("SELECT * FROM Task WHERE subject_id = :subjectId")
+    @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE subject_id = :subjectId")
     override suspend fun getTasksOfSubject(subjectId: Int): List<Task>
 }

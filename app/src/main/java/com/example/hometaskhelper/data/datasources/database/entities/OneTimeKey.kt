@@ -4,19 +4,16 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = Subject.TABLE_NAME)
-data class Subject(
+@Entity(tableName = OneTimeKey.TABLE_NAME)
+data class OneTimeKey(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Int,
 
-    @ColumnInfo(name = "subject_name")
-    val subjectName: String,
-
-    @ColumnInfo(name = "aliases")
-    val aliases: String
+    @ColumnInfo(name = "key_value")
+    val keyValue: String
 ) {
     companion object {
-        const val TABLE_NAME = "Subjects"
+        const val TABLE_NAME = "OneTimeKeys"
     }
 }

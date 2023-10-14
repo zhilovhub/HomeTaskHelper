@@ -1,6 +1,6 @@
 package com.example.hometaskhelper.di
 
-import com.example.hometaskhelper.data.DataSourceType
+import com.example.hometaskhelper.data.repositories.DataSourceType
 import com.example.hometaskhelper.data.repositories.AppRepository
 import com.example.hometaskhelper.data.datasources.database.DatabaseDao
 import com.example.hometaskhelper.data.datasources.network.SQLApi

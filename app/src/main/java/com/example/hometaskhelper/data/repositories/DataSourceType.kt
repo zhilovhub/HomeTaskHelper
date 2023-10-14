@@ -1,4 +1,4 @@
-package com.example.hometaskhelper.data
+package com.example.hometaskhelper.data.repositories
 
 enum class DataSourceType {
     Network,

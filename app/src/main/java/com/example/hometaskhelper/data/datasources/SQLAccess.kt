@@ -14,8 +14,6 @@ interface SQLAccess {
 
     suspend fun getUserFinishedTasks(id: Int): String
 
-    suspend fun getUserTgId(id: Int): Int
-
     suspend fun addSubject(subject: Subject)
 
     suspend fun updateSubject(subject: Subject)

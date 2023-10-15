@@ -9,7 +9,7 @@ import dbWorker
 from aiogram.fsm.state import StatesGroup, State
 import re
 from cfg import DB_PATH
-import taskPreparer
+import linePreparer
 r = Router()
 db = dbWorker.dataBaseWorker(DB_PATH)
 logging.basicConfig(level=logging.INFO)
@@ -17,19 +17,37 @@ class Register(StatesGroup): # - step by step registration
     waitingForKey = State()
     waitingForUserName = State()
     waitingForPassword = State()
+
+
 class Login(StatesGroup):
     waitingForLogin = State()
     waitingForPassword = State()
+
+
 class CreateSubject(StatesGroup):
     waitingForSubjectName = State()
+
+
 class DeleteSubject(StatesGroup):
     waitingForDeletingSubject = State()
+
+
 class CreateTask(StatesGroup):
     pass
+
+
+class AddAlias(StatesGroup):
+    waitingForSubjectNAlias = State()
+    waitingForSubject = State()
+    waitingForAlias = State()
+
+
 @r.message(Command("start"))
 async def start(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register😁\nчтобы отменить текущее действие, напиши /cancel")
+
+
 @r.message(Command("register"))
 async def register(message: types.Message, state: FSMContext):
     await state.clear()
@@ -38,10 +56,14 @@ async def register(message: types.Message, state: FSMContext):
         return
     await message.answer("Введите ключ доступа для продолжения работы🙃\nНапишите /login,если у вас уже есть учетная запись")
     await state.set_state(Register.waitingForKey)
+
+
 @r.message(Command("cancel"))
 async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Текущее действие отменено🗑️")
+
+
 @r.message(Register.waitingForKey)
 async def verifyKey(message: types.Message, state: FSMContext):
     if not db.verifyOneTimeKey(message.text):
@@ -53,6 +75,8 @@ async def verifyKey(message: types.Message, state: FSMContext):
                   "\nНе используйте спецсимволы и пробелы"
                   "\nДлина до 64 символов")
     await state.set_state(Register.waitingForUserName)
+
+
 @r.message(Register.waitingForUserName)
 async def setUpUserName(message: types.Message, state: FSMContext):
     if not re.fullmatch(r"[\w\d]{4,64}",message.text):
@@ -61,6 +85,8 @@ async def setUpUserName(message: types.Message, state: FSMContext):
     await state.update_data(userName = message.text)
     await message.answer("Придумайте сложный пароль🤓")
     await state.set_state(Register.waitingForPassword)
+
+
 @r.message(Register.waitingForPassword)
 async def setUpPassword(message: types.Message, state: FSMContext):
     if not re.fullmatch(r".{8,1024}",message.text):
@@ -71,6 +97,8 @@ async def setUpPassword(message: types.Message, state: FSMContext):
     db.addUser(userData["userName"], message.chat.id, message.text, 0)
     await message.answer("Регистрация прошла успешно😎")
     await state.clear()
+
+
 @r.message(Command("login"))
 async def login(message: types.Message, state: FSMContext):
     await state.clear()
@@ -79,6 +107,8 @@ async def login(message: types.Message, state: FSMContext):
         return
     await message.answer("Введите логин")
     await state.set_state(Login.waitingForLogin)
+
+
 @r.message(Login.waitingForLogin)
 async def parseLogin(message: types.Message, state: FSMContext):
     if not db.isUserNAME(message.text):
@@ -87,6 +117,8 @@ async def parseLogin(message: types.Message, state: FSMContext):
     await message.answer("Пользователь найден✅\nВведите пароль")
     await state.update_data(userName = message.text)
     await state.set_state(Login.waitingForPassword)
+
+
 @r.message(Login.waitingForPassword)
 async def parsePassword(message: types.Message, state: FSMContext):
     userData = await state.get_data()
@@ -94,15 +126,20 @@ async def parsePassword(message: types.Message, state: FSMContext):
         await message.answer("Пароль неверный🫤")
     db.addTelegramToExisting(message.chat.id,userData["userName"])
     await message.answer("Авторизация прошла успешно🙃")
-    state.clear()
+    await state.clear()
     return
+
+
 @r.message(F.text.lower().startswith("добавь"))
 async def addTask(message: types.Message, state: FSMContext):
-    if taskPreparer.taskIsValid(message.text,db):
-        l = taskPreparer.prepareTask(message.text)
-        db.addTask(l)
-        await message.answer(f"На {l[1]} число по предмету {l[0]} добавлено задание {l[2]}")
-    else:await message.answer("Ты неверно описал задание, формат:\n Добавь (Название предмета) на (дата вида 00.00) (описание задания)\nСкобки не нужны😉")
+    if linePreparer.taskIsValid(message.text,db):
+        l = linePreparer.prepareTask(message.text)
+        if linePreparer.subjectExists(l[0],db):
+            db.addTask(l)
+            await message.answer(f"На {l[1]} число по предмету {l[0]} добавлено задание {l[2]}")
+    await message.answer("Ты неверно описал задание или предмета не существует, формат:\nДобавь (Название предмета) на (дата вида 00.00) (описание задания)")
+
+
 @r.message(Command("newsub"))
 async def addSubject(message: types.Message, state: FSMContext):
     t = message.text
@@ -111,27 +148,72 @@ async def addSubject(message: types.Message, state: FSMContext):
         await state.set_state(CreateSubject.waitingForSubjectName)
         return
     else:
-        name = " ".join(t.split()[1:]).lower()
+        name = linePreparer.prepareSub(t).lower()
         db.addSub(name)
         await message.answer(f"Предмет {name} добавлен🥲")
+
+
 @r.message(CreateSubject.waitingForSubjectName)
 async def addSubjectByName(message: types.Message, state: FSMContext):
-    t = message.text
-    name = " ".join(t.split()[1:]).lower()
-    db.addSub(name.capitalize())
-    await message.answer(f"Предмет {name} добавлен🥲")
+    t = message.text.lower()
+    db.addSub(t)
+    await message.answer(f"Предмет {t} добавлен🥲")
     await state.clear()
-@r.message(DeleteSubject)
+
+
+@r.message(Command("delsub"))
 async def prepToDelSubject(message: types.Message, state: FSMContext):
-    subjects = db.getSubjectNames()
+    subjects = db.getSubjectNamesAndIDs()
     buttons = [[types.InlineKeyboardButton(text = i[1], callback_data=f"DS {i[0]}")] for i in subjects]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     await message.answer("Выбери предмет для удаления🫠",reply_markup=kb)
-@r.message(F.data.startswith("DS"))
-async def delSubject(data:types.CallbackQuery):
-    subject = int(data.message.text.split()[3:])
-    db.delSubByID(subject)
-    await data.answer(f"Предмет {subject} удален😁")
 
+
+@r.callback_query(F.data.startswith("DS"))
+async def delSubject(data:types.CallbackQuery):
+    subject = int(data.data.split()[1])
+    db.delSubByID(subject)
+    await data.message.edit_text(f"Предмет удален😁",reply_markup=None)
+
+
+@r.message(Command("deltask"))
+async def prepToDelTask(message: types.Message, state: FSMContext):
+    tasks = db.getTasks()
+    buttons = [[types.InlineKeyboardButton(text = i[1],callback_data=f"DT {i[0]}")] for i in tasks]
+    kb = types.InlineKeyboardMarkup(keyboard=buttons)
+    await message.answer("Выбери задание для удаления",reply_markup=kb)
+
+
+@r.callback_query(F.data.startswith("DT"))
+async def delTask(data: types.CallbackQuery):
+    taskID = int(data.message.text.split()[1])
+    db.delTask(taskID)
+    await data.answer("Задание удалено😎")
+
+
+@r.message(Command("listtasks"))
+async def displayTasks(message: types.Message, state: FSMContext):
+    txt = db.getAllTasksWithSubjects()
+    await message.answer("Задачи:\n"+txt)
+
+
+@r.message(Command("addalias"))
+async def startAddAlias(message: types.Message, state: FSMContext):
+    await message.answer("Отправь мне название предмета, для которого ты хочешь добавить синоним,\nИ сам синоним в одном сообщении (через запятую)🤯")
+    await state.set_state(AddAlias.waitingForSubjectNAlias)
+
+
+@r.message(AddAlias.waitingForSubjectNAlias)
+async def addAlias(message: types.Message, state: FSMContext):
+    subject_name, alias = linePreparer.prepareAlias(message.text)
+    print(subject_name, alias)
+    reply = db.aliasIsValid(subject_name,alias)
+    if reply==0:
+        db.addAlias(subject_name,alias)
+        await message.answer(f"Добавлен синоним {alias} для предмета {subject_name}")
+        await state.clear()
+        return
+    elif reply==1: await message.answer("Такой предмет не найден")
+    elif reply==2: await message.answer("Такой синоним уже существует")
 
 

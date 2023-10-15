@@ -133,10 +133,11 @@ async def parsePassword(message: types.Message, state: FSMContext):
 @r.message(F.text.lower().startswith("добавь"))
 async def addTask(message: types.Message, state: FSMContext):
     if linePreparer.taskIsValid(message.text,db):
-        l = linePreparer.prepareTask(message.text)
-        if linePreparer.subjectExists(l[0],db):
-            db.addTask(l)
-            await message.answer(f"На {l[1]} число по предмету {l[0]} добавлено задание {l[2]}")
+        subject,date,description = linePreparer.prepareTask(message.text)
+        if linePreparer.subjectExists(subject,db):
+            db.addTask(subject,date,description)
+            await message.answer(f"На {date} число по предмету {subject} добавлено задание {description}")
+            return
     await message.answer("Ты неверно описал задание или предмета не существует, формат:\nДобавь (Название предмета) на (дата вида 00.00) (описание задания)")
 
 

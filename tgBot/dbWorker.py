@@ -37,7 +37,7 @@ class dataBaseWorker():
         cur.execute("CREATE TABLE IF NOT EXISTS Subjects (id INTEGER PRIMARY KEY AUTOINCREMENT, subject_name TEXT, aliases LIST)")
         # cur.execute("DROP TABLE Tasks")
         cur.execute("""CREATE TABLE IF NOT EXISTS Tasks 
-                    (num INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
                     subject_id INTEGER, 
                     description TEXT, 
                     from_date DATE,
@@ -45,12 +45,12 @@ class dataBaseWorker():
                     is_redacting BOOLEAN,
                     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE)""")
         cur.execute("""CREATE TABLE IF NOT EXISTS Users 
-                    (num INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
                     user_name TEXT, 
                     group_id TEXT, 
                     finished_tasks LIST, 
                     redacting_task INTEGER)""")
-        cur.execute("CREATE TABLE IF NOT EXISTS OneTimeKeys (num INTEGER PRIMARY KEY AUTOINCREMENT, key_value TEXT)")
+        cur.execute("CREATE TABLE IF NOT EXISTS OneTimeKeys (id INTEGER PRIMARY KEY AUTOINCREMENT, key_value TEXT)")
         base.commit(); cur.close(); base.close()
         logging.log(20,"Tables created successfully")
 
@@ -80,14 +80,17 @@ class dataBaseWorker():
         logging.log(20,"Added new User")
 
 
-    def addTask(self, data: list):
+    def addTask(self, subject_name: str, date: str, description: str):
         base, cur = self.connectBase()
         aliases = self.getSubjectIDsAndAliases()
-        print(aliases)
+        # print(aliases)
+        # print(data[0])
         for i in aliases:
-            if data[0] in json.loads(i[1]):data[0]=i[0]
-        print(data[0])
-        cur.execute("INSERT INTO Tasks (subject_id, to_date, description) VALUES (?, ?, ?)", data)
+            print(json.loads(i[1]))
+            if subject_name in json.loads(i[1]):subject_name=i[0]
+            subID = i[0]
+            print(subID)
+        cur.execute("INSERT INTO Tasks (subject_id, to_date, description) VALUES (?, ?, ?)", (subID,date,description))
         cur.close(); base.commit(); base.close()
         logging.log(20,"Added new task")
 
@@ -141,8 +144,9 @@ class dataBaseWorker():
 
     def addSub(self,name):
         base, cur = self.connectBase()
-        cur.execute("INSERT INTO Subjects (subject_name, aliases) VALUES (?, ?)",(name,json.dumps(name)))
-        print(cur.execute("SELECT subject_name FROM Subjects").fetchall())
+        name = name.lower()
+        cur.execute("INSERT INTO Subjects (subject_name, aliases) VALUES (?, ?)",(name,json.dumps([name])))
+        # print(cur.execute("SELECT subject_name FROM Subjects").fetchall())
         cur.close(); base.commit(); base.close()
         logging.log(20,"New subject added")
 
@@ -157,8 +161,11 @@ class dataBaseWorker():
     def getSubjectsAliases(self):
         base, cur = self.connectBase()
         raw_subs = [json.loads(i[0]) for i in cur.execute("SELECT aliases FROM Subjects").fetchall()]
+        print(raw_subs)
         subs = []
-        for i in raw_subs: subs.append(i)
+        for i in raw_subs:
+            for a in i: subs.append(a)
+        print(subs)
         cur.close(); base.commit(); base.close()
         logging.log(20,"Fetched all aliases from subject")
         return subs
@@ -178,9 +185,10 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectIDsAndAliases(self):
+    def getSubjectIDsAndAliases(self): #-> [[id,[aliases]]]
         base, cur = self.connectBase()
         subs = cur.execute("SELECT id,aliases FROM Subjects").fetchall()
+        print(subs)
         cur.close(); base.commit(); base.close()
         logging.log(20, "Fetched subject_name's & aliases")
         return subs
@@ -198,29 +206,33 @@ class dataBaseWorker():
         base, cur = self.connectBase()
         l = ""
         for sub in cur.execute("SELECT id, subject_name FROM Subjects").fetchall():
-            print(sub[1])
-            tasks = cur.execute("SELECT subject_id, to_date, description FROM Tasks WHERE subject_id = ?", (sub[1],)).fetchall()
+            print(sub[0])
+            tasks = cur.execute("SELECT subject_id, to_date, description FROM Tasks WHERE subject_id = ?", (sub[0],)).fetchall()
             print(cur.execute("SELECT subject_id, to_date, description FROM Tasks").fetchall())
-            line = sub[1]+"\n".join([i[0]+i[1] for i in tasks])+"\n"
+            line = sub[1]+"\n"+"\n".join([i[1]+" - "+i[2] for i in tasks])+"\n"
             l+=line
         return l
 
 
-    def addAlias(self, subject_name, alias):
+    def addAlias(self, subject_name: str, alias: str):
         base, cur = self.connectBase()
-        print(cur.execute("SELECT aliases FROM Subjects WHERE subject_name = ?",("фвыв",)).fetchall())
-        cur.execute("UPDATE Subjects SET aliases = json_insert(aliases,?) WHERE subject_name = ?", (json.dumps(alias),subject_name))
+        subject_name, alias = subject_name.lower(), alias.lower()
+
+        # print(json.loads(cur.execute("SELECT aliases FROM Subjects WHERE subject_name = ?", (subject_name,)).fetchone()[0]))
+        aliases = json.loads(cur.execute("SELECT aliases FROM Subjects WHERE subject_name = ?", (subject_name,)).fetchone()[0])+[alias]
+        cur.execute("UPDATE Subjects SET aliases = ? WHERE subject_name = ?", (json.dumps(aliases),subject_name))
         cur.close(); base.commit(); base.close()
         logging.log(20,"Added new Alias")
 
 
     def aliasIsValid(self, subject_name, alias): #-> 0,1,2 : 0-is valid, 1-subject_name not found, 2-alias already exists
         base, cur = self.connectBase()
+        subject_name, alias = subject_name.lower(), alias.lower()
         raw_aliases = [json.loads(i[0]) for i in cur.execute("SELECT aliases FROM Subjects").fetchall()]
-        print(cur.execute("SELECT aliases FROM Subjects").fetchall())
+        # print(cur.execute("SELECT aliases FROM Subjects").fetchall())
         aliases = []
         for i in raw_aliases:aliases.append(i)
-        print(aliases)
+        # print(aliases)
         if not subject_name in [i[0] for i in cur.execute("SELECT subject_name FROM Subjects").fetchall()]:return 1
         elif alias in aliases:return 2
         return 0

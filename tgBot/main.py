@@ -30,10 +30,10 @@ async def main():
     await startBot(*setupBot())
 
 async def startBot(bot,dp):
-    if os.name in ["posix","Windows"]:
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
-    else:
-        await setupWebApp(bot,dp)
+    # if os.name in ["posix","Windows"]:
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    # else:
+    #     await setupWebApp(bot,dp)
 
 if __name__=="__main__":
     logging.basicConfig(level=logging.INFO)

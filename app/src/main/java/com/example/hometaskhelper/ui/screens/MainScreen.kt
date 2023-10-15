@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,14 +22,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,10 +39,15 @@ import androidx.compose.ui.unit.sp
 import com.example.hometaskhelper.R
 import com.example.hometaskhelper.ui.models.Task
 import com.example.hometaskhelper.ui.theme.HomeTaskHelperTheme
+import com.example.hometaskhelper.ui.viewmodels.MainViewModel
 
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(LocalContext.current.applicationContext))
+) {
+    val tasksState = viewModel.tasksState.collectAsState()
     val userState = remember { mutableStateOf(UserState.DEFAULT) }
 
     Surface(
@@ -65,6 +71,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 )
                 Tasks(
                     userState = userState,
+                    tasks = tasksState.value,
                     modifier = Modifier.weight(1f)
                 )
                 RedactTasks(userState = userState)
@@ -81,26 +88,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun Tasks(userState: MutableState<UserState>, modifier: Modifier = Modifier, tasks: List<Task> = listOf(
-    Task("Матан", "21.09.23\n1-4 номера без букв А", false),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б", true),
-    Task("Физ-ра",  "22.09.23\n1-8 номера без букв Б", false),
-    Task("Физика",  "22.09.23\n1-8 номера без букв Б", false),
-    Task("Инфа",  "22.09.23\n1-8 номера без букв Б", true),
-    Task("Алгы",  "22.09.23\n1-8 номера без букв Б", false),
-//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("История",  "\nЭссе", false),
-)) {
-
+fun Tasks(userState: MutableState<UserState>, tasks: List<com.example.hometaskhelper.data.datasources.database.entities.Task>, modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tasks) {task ->
-            Task(task = task, userState = userState)
+            Task(task = Task(name = task.subjectId.toString(), description = task.description, finished = task.isFinished), userState = userState)
         }
     }
 }

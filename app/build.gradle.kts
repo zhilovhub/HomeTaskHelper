@@ -65,10 +65,12 @@ dependencies {
     // To use Kotlin Symbol Processing (KSP)
     ksp("androidx.room:room-compiler:$roomVersion")
 
-
     // dagger
     implementation("com.google.dagger:dagger:2.48")
     ksp("com.google.dagger:dagger-compiler:2.48")
+
+    // viewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
     // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

@@ -3,6 +3,7 @@ package com.example.hometaskhelper.data.datasources
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.User
+import kotlinx.coroutines.flow.Flow
 
 interface SQLAccess {
 
@@ -33,5 +34,7 @@ interface SQLAccess {
     suspend fun getTaskById(id: Int): Task
 
     suspend fun getTasksOfSubject(subjectId: Int): List<Task>
+
+    fun getAllTasks(): Flow<List<Task>>
 
 }

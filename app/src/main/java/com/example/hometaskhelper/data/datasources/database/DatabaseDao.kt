@@ -9,6 +9,7 @@ import com.example.hometaskhelper.data.datasources.SQLAccess
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.User
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DatabaseDao : SQLAccess {
@@ -54,4 +55,7 @@ interface DatabaseDao : SQLAccess {
 
     @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE subject_id = :subjectId")
     override suspend fun getTasksOfSubject(subjectId: Int): List<Task>
+
+    @Query("SELECT * FROM ${Task.TABLE_NAME}")
+    override fun getAllTasks(): Flow<List<Task>>
 }

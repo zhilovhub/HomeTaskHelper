@@ -9,6 +9,7 @@ import com.example.hometaskhelper.MainApplication
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.repositories.AppRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val repository: AppRepository
@@ -58,6 +60,10 @@ class MainViewModel(
 
     fun getAllTasks(): Flow<List<Task>> {
         return repository.getAllTasks()
+    }
+
+    suspend fun getSubjectNameById(id: Int): String {
+        return repository.getSubjectNameById(id)
     }
 
     fun getAllTempTasks(): Flow<List<TempTask>> {

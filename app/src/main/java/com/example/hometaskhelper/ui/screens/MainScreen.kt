@@ -206,7 +206,16 @@ fun Task(userState: UserState,
         ) {
             Column {
                 Text(
-                    text = task.subjectId.toString(),
+                    text = when(task.subjectId) {
+                                                1 -> "Матан"
+                                                2 -> "Линал"
+                                                3 -> "Физ-ра"
+                                                4 -> "Физика"
+                                                5 -> "Инфа"
+                                                6 -> "Алгы"
+                                                7 -> "История"
+                        else -> "ОРГ"
+                                                },
                     fontWeight = FontWeight.Bold
                 )
                 Row {

@@ -39,6 +39,9 @@ interface DatabaseDao : SQLAccess {
     @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
     override suspend fun getSubjectById(id: Int): Subject
 
+    @Query("SELECT subject_name FROM ${Subject.TABLE_NAME} WHERE id = :id")
+    override suspend fun getSubjectNameById(id: Int): String
+
     @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
     override suspend fun getSubjectByName(id: Int): Subject
 

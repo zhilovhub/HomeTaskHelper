@@ -33,6 +33,10 @@ class AppRepository(
         return dataSource.getAllTasks()
     }
 
+    suspend fun getSubjectNameById(id: Int): String {
+        return dataSource.getSubjectNameById(id)
+    }
+
     fun getAllTempTasks(): Flow<List<TempTask>> {
         return dataSource.getAllTempTasks()
     }

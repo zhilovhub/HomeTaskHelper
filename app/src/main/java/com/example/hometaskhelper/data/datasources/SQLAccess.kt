@@ -24,6 +24,8 @@ interface SQLAccess {
 
     suspend fun getSubjectById(id: Int): Subject
 
+    suspend fun getSubjectNameById(id: Int): String
+
     suspend fun getSubjectByName(id: Int): Subject
 
     suspend fun addTask(task: Task)

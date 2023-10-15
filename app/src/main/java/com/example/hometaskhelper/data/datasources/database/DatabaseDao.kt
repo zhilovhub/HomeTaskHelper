@@ -8,6 +8,7 @@ import androidx.room.Update
 import com.example.hometaskhelper.data.datasources.SQLAccess
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
+import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
 import kotlinx.coroutines.flow.Flow
 
@@ -58,4 +59,19 @@ interface DatabaseDao : SQLAccess {
 
     @Query("SELECT * FROM ${Task.TABLE_NAME}")
     override fun getAllTasks(): Flow<List<Task>>
+
+    @Insert
+    override suspend fun addTempTask(tempTask: TempTask)
+
+    @Update
+    override suspend fun updateTempTasK(tempTask: TempTask)
+
+    @Delete
+    override suspend fun deleteTempTask(tempTask: TempTask)
+
+    @Query("DELETE FROM ${TempTask.TABLE_NAME}")
+    override suspend fun deleteAllTempTasks()
+
+    @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
+    override fun getAllTempTasks(): Flow<List<TempTask>>
 }

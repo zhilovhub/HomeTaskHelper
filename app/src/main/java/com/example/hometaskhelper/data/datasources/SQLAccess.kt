@@ -2,6 +2,7 @@ package com.example.hometaskhelper.data.datasources
 
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
+import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
 import kotlinx.coroutines.flow.Flow
 
@@ -36,5 +37,15 @@ interface SQLAccess {
     suspend fun getTasksOfSubject(subjectId: Int): List<Task>
 
     fun getAllTasks(): Flow<List<Task>>
+
+    suspend fun addTempTask(tempTask: TempTask)
+
+    suspend fun updateTempTasK(tempTask: TempTask)
+
+    suspend fun deleteTempTask(tempTask: TempTask)
+
+    suspend fun deleteAllTempTasks()
+
+    fun getAllTempTasks(): Flow<List<TempTask>>
 
 }

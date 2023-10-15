@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hometaskhelper.R
-import com.example.hometaskhelper.ui.models.Task
+import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.ui.theme.HomeTaskHelperTheme
 import com.example.hometaskhelper.ui.viewmodels.MainViewModel
 
@@ -49,6 +49,10 @@ fun HomeScreen(
 ) {
     val tasksState = viewModel.tasksState.collectAsState()
     val userState = remember { mutableStateOf(UserState.DEFAULT) }
+
+    val deleteTaskAction = {task: Task ->
+        viewModel.deleteTask(task)
+    }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -72,6 +76,7 @@ fun HomeScreen(
                 Tasks(
                     userState = userState,
                     tasks = tasksState.value,
+                    deleteAction = deleteTaskAction,
                     modifier = Modifier.weight(1f)
                 )
                 RedactTasks(userState = userState)
@@ -88,20 +93,27 @@ fun HomeScreen(
 
 
 @Composable
-fun Tasks(userState: MutableState<UserState>, tasks: List<com.example.hometaskhelper.data.datasources.database.entities.Task>, modifier: Modifier = Modifier) {
+fun Tasks(userState: MutableState<UserState>,
+          tasks: List<Task>,
+          deleteAction: (Task) -> Unit,
+          modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(tasks) {task ->
-            Task(task = Task(name = task.subjectId.toString(), description = task.description, finished = task.isFinished), userState = userState)
+            Task(task = task, deleteAction = deleteAction, userState = userState)
         }
     }
 }
 
 
 @Composable
-fun RedactTasks(userState: MutableState<UserState>, modifier: Modifier = Modifier) {
+fun RedactTasks(
+    userState: MutableState<UserState>,
+    modifier: Modifier = Modifier
+) {
     val buttonsEnabled = when (userState.value) {
         UserState.DELETING -> false
         else -> true
@@ -166,10 +178,11 @@ fun AcceptCancel(userState: MutableState<UserState>, modifier: Modifier = Modifi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Task(userState: MutableState<UserState>,
+         deleteAction: (Task) -> Unit,
          modifier: Modifier = Modifier,
-         task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б", false)) {
+         task: Task = Task(id = 99, 1, "1-8 номера без букв Б", "22.09.23", false, false)) {
     val taskDescription = remember { mutableStateOf(task.description) }
-    val taskFinished = remember { mutableStateOf(task.finished) }
+    val taskFinished = remember { mutableStateOf(task.isFinished) }
 
     Surface(
         modifier = modifier
@@ -180,7 +193,7 @@ fun Task(userState: MutableState<UserState>,
         ) {
             Column {
                 Text(
-                    text = task.name,
+                    text = task.subjectId.toString(),
                     fontWeight = FontWeight.Bold
                 )
                 Row {
@@ -195,7 +208,7 @@ fun Task(userState: MutableState<UserState>,
                         if (userState.value == UserState.DELETING) {
                             IconButton(
                                 modifier = Modifier.align(Alignment.TopEnd),
-                                onClick = {  }
+                                onClick = { deleteAction(task) }
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.baseline_delete_24),

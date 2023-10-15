@@ -29,8 +29,14 @@ class MainViewModel(
         }
     }
 
-    private fun getAllTasks(): Flow<List<Task>> {
+    fun getAllTasks(): Flow<List<Task>> {
         return repository.getAllTasks()
+    }
+
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            repository.deleteTask(task)
+        }
     }
 
     companion object {

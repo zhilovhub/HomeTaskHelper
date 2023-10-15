@@ -1,8 +1,8 @@
 package com.example.hometaskhelper.ui.models
 
 
-data class Task(
-    val name: String,
-    val description: String,
-    val finished: Boolean
-)
+//data class Task(
+//    val name: String,
+//    val description: String,
+//    val finished: Boolean
+//)

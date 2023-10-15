@@ -21,5 +21,9 @@ class AppRepository(
         return dataSource.getAllTasks()
     }
 
+    suspend fun deleteTask(task: Task) {
+        dataSource.deleteTask(task)
+    }
+
 }
 

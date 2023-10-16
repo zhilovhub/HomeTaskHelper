@@ -23,12 +23,9 @@ class MainViewModel(
     private val repository: AppRepository
 ) : ViewModel() {
 
-//    private val _uiState = MutableStateFlow(UiState.Tasks(emptyList()))
-//    val uiState: StateFlow<UiState> =_uiState.asStateFlow()
-
     private val _tasksState = MutableStateFlow(emptyList<Task>())
     val tasksState: StateFlow<List<Task>> = _tasksState.asStateFlow()
-//
+
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
@@ -37,12 +34,12 @@ class MainViewModel(
             getAllTasks().collect {
                 _tasksState.value = it
             }
-//            getAllTempTasks().collect {
-//                if (_userState.value != UserState.DEFAULT) {
-//                    _uiState.value = UiState.TempTasks(it)
-//                }
-//            }
-            // НАДО ЧТОБЫ МОЖНО БЫЛО КОПИРОВАТЬ ЗАДАНИЯ ИЗ ОДНОГО В ДРУГОЕ
+        }
+    }
+
+    fun tempSaveCurrentTasks() {
+        viewModelScope.launch {
+            repository.copyFromTasksToTempTasks()
         }
     }
 

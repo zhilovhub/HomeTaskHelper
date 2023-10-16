@@ -77,4 +77,9 @@ interface DatabaseDao : SQLAccess {
 
     @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
     override fun getAllTempTasks(): Flow<List<TempTask>>
+
+    @Query("INSERT INTO ${TempTask.TABLE_NAME} " +
+            "(id, task_id, subject_id, description, to_date, is_redacting, is_finished) " +
+            "SELECT null, id, subject_id, description, to_date, is_redacting, is_finished FROM ${Task.TABLE_NAME}")
+    override suspend fun copyFromTasksToTempTasks()
 }

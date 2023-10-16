@@ -45,5 +45,9 @@ class AppRepository(
         dataSource.deleteTask(task)
     }
 
+    suspend fun copyFromTasksToTempTasks() {
+        dataSource.copyFromTasksToTempTasks()
+    }
+
 }
 

@@ -50,4 +50,6 @@ interface SQLAccess {
 
     fun getAllTempTasks(): Flow<List<TempTask>>
 
+    suspend fun copyFromTasksToTempTasks()
+
 }

@@ -23,9 +23,10 @@ fun RedactTasks(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    val buttonsEnabled = when (userState) {
-        UserState.DELETING -> false
-        else -> true
+    val (addEnable, deleteEnable) = when (userState) {
+        UserState.DEFAULT -> Pair(true, true)
+        UserState.REDACTING -> Pair(true, false)
+        UserState.DELETING -> Pair(false, false)
     }
 
     Row(
@@ -34,8 +35,10 @@ fun RedactTasks(
 
         Button(
             modifier = Modifier,
-            enabled = buttonsEnabled,
-            onClick = {  }
+            enabled = addEnable,
+            onClick = {
+                viewModel.updateUserState(UserState.REDACTING)
+            }
         ) {
             Text("Добавить")
         }
@@ -44,7 +47,7 @@ fun RedactTasks(
         )
         Button(
             modifier = Modifier,
-            enabled = buttonsEnabled,
+            enabled = deleteEnable,
             onClick = {
                 viewModel.updateUserState(UserState.DELETING)
             }
@@ -60,17 +63,13 @@ fun AcceptCancel(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
+    val action = { viewModel.updateUserState(UserState.DEFAULT) }
+
     Row(
         modifier = modifier,
     ) {
         IconButton(
-            onClick = {
-//                val tasks = viewModel.getAllTempTasks()
-
-//                viewModel.updateTasks(tasks)
-//                viewModel.deleteAllTempTasks()
-                viewModel.updateUserState(UserState.DEFAULT)
-            }
+            onClick = action
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_check_circle_24),
@@ -78,10 +77,7 @@ fun AcceptCancel(
             )
         }
         IconButton(
-            onClick = {
-//                viewModel.deleteAllTempTasks()
-                viewModel.updateUserState(UserState.DEFAULT)
-            }
+            onClick = action
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_cancel_24),

@@ -38,10 +38,8 @@ class MainViewModel(
     }
 
     fun tempSaveCurrentTasks() {
-        if (_userState.value == UserState.DEFAULT) {
-            viewModelScope.launch {
-                repository.copyFromTasksToTempTasks()
-            }
+        viewModelScope.launch {
+            repository.copyFromTasksToTempTasks()
         }
     }
 

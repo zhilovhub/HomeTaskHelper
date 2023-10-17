@@ -1,27 +1,25 @@
 package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.example.hometaskhelper.MainApplication
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.repositories.AppRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val repository: AppRepository
 ) : ViewModel() {
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val _tasksState = MutableStateFlow(emptyList<Task>())
     val tasksState: StateFlow<List<Task>> = _tasksState.asStateFlow()
@@ -30,7 +28,7 @@ class MainViewModel(
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        coroutineScope.launch {
             getAllTasks().collect {
                 _tasksState.value = it
             }
@@ -38,19 +36,19 @@ class MainViewModel(
     }
 
     fun tempSaveCurrentTasks() {
-        viewModelScope.launch {
+        coroutineScope.launch {
             repository.copyFromTasksToTempTasks()
         }
     }
 
-    fun addTempTask(tempTask: TempTask) {
-        viewModelScope.launch {
-            repository.addTempTask(tempTask)
+    fun addTask(task: Task) {
+        coroutineScope.launch {
+            repository.addTask(task)
         }
     }
 
     fun deleteAllTempTasks() {
-        viewModelScope.launch {
+        coroutineScope.launch {
             repository.deleteAllTempTasks()
         }
     }
@@ -59,22 +57,14 @@ class MainViewModel(
         return repository.getAllTasks()
     }
 
-    suspend fun getSubjectNameById(id: Int): String {
-        return repository.getSubjectNameById(id)
-    }
-
-    fun getAllTempTasks(): Flow<List<TempTask>> {
-        return repository.getAllTempTasks()
-    }
-
     fun deleteTask(task: Task) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             repository.deleteTask(task)
         }
     }
 
     fun updateTasks(tasks: List<Task>) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             for (task in tasks) {
                 repository.updateTask(task)
             }
@@ -88,10 +78,11 @@ class MainViewModel(
             else -> tempSaveCurrentTasks()
         }
     }
-
+    
     override fun onCleared() {
         super.onCleared()
-//        deleteAllTempTasks()
+        deleteAllTempTasks()
+        coroutineScope.cancel()
     }
 
     companion object {

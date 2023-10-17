@@ -1,5 +1,6 @@
 package com.example.hometaskhelper.data.repositories
 
+import android.util.Log
 import com.example.hometaskhelper.data.datasources.database.DatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
@@ -20,6 +21,10 @@ class AppRepository(
 
     suspend fun addTempTask(tempTask: TempTask) {
         dataSource.addTempTask(tempTask)
+    }
+
+    suspend fun addTask(task: Task) {
+        dataSource.addTask(task)
     }
 
     suspend fun updateTask(task: Task) {

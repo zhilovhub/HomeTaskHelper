@@ -72,10 +72,12 @@ class MainViewModel(
     }
 
     fun updateUserState(newState: UserState) {
-        _userState.value = newState
-        when (newState) {
-            UserState.DEFAULT -> deleteAllTempTasks()
-            else -> tempSaveCurrentTasks()
+        if (newState != _userState.value){
+            _userState.value = newState
+            when (newState) {
+                UserState.DEFAULT -> deleteAllTempTasks()
+                else -> tempSaveCurrentTasks()
+            }
         }
     }
     

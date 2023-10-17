@@ -51,8 +51,15 @@ fun Task(userState: UserState,
          viewModel: MainViewModel,
          modifier: Modifier = Modifier,
          task: Task = Task(id = 99, 1, "1-8 номера без букв Б", "22.09.23", false, false)) {
+    val taskId = rememberSaveable { mutableStateOf(task.id) }
     val taskDescription = rememberSaveable { mutableStateOf(task.description) }
     val taskFinished = rememberSaveable { mutableStateOf(task.isFinished) }
+
+    if (taskId.value != task.id) {
+        taskId.value = task.id
+        taskDescription.value = task.description
+        taskFinished.value = task.isFinished
+    }
 
     Surface(
         modifier = modifier

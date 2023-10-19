@@ -38,6 +38,7 @@ fun RedactTasks(
             enabled = addEnable,
             onClick = {
                 viewModel.updateUserState(UserState.REDACTING)
+                viewModel.addNewTask()
             }
         ) {
             Text("Добавить")

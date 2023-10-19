@@ -5,10 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.hometaskhelper.data.datasources.SQLAccess
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
 import kotlinx.coroutines.flow.Flow
 

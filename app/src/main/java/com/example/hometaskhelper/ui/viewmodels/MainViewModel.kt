@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
+import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
+import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -21,8 +23,8 @@ class MainViewModel(
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private val _tasksState = MutableStateFlow(emptyList<Task>())
-    val tasksState: StateFlow<List<Task>> = _tasksState.asStateFlow()
+    private val _tasksState = MutableStateFlow(emptyList<ModelTask>())
+    val tasksState: StateFlow<List<ModelTask>> = _tasksState.asStateFlow()
 
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
@@ -41,9 +43,23 @@ class MainViewModel(
         }
     }
 
-    fun addTask(task: Task) {
+    fun addNewTask() {
         coroutineScope.launch {
-            repository.addTask(task)
+            val subjectId = repository.addNewSubject(
+                Subject(
+                    id = 0,
+                    "Новый",
+                    ""
+                )
+            )
+            repository.addTask(Task(
+                id = 0,
+                subjectId = subjectId.toInt(),
+                description = "",
+                toDate = "",
+                isRedacting = true,
+                isFinished = false
+            ))
         }
     }
 
@@ -53,7 +69,7 @@ class MainViewModel(
         }
     }
 
-    fun getAllTasks(): Flow<List<Task>> {
+    fun getAllTasks(): Flow<List<ModelTask>> {
         return repository.getAllTasks()
     }
 

@@ -2,56 +2,55 @@ package com.example.hometaskhelper.data.repositories
 
 import android.util.Log
 import com.example.hometaskhelper.data.datasources.database.DatabaseDao
+import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.network.SQLApi
+import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.flow.Flow
 
 
 class AppRepository(
-    databaseDao: DatabaseDao,
-    sqlApi: SQLApi,
-    dataSourceType: DataSourceType
+    private val databaseDao: DatabaseDao,
+    private val sqlApi: SQLApi
 ) {
-
-    private val dataSource = when (dataSourceType) {
-        DataSourceType.Network -> sqlApi
-        DataSourceType.LocalDatabase -> databaseDao
-    }
-
     suspend fun addTempTask(tempTask: TempTask) {
-        dataSource.addTempTask(tempTask)
+        databaseDao.addTempTask(tempTask)
     }
 
     suspend fun addTask(task: Task) {
-        dataSource.addTask(task)
+        return databaseDao.addTask(task)
+    }
+
+    suspend fun addNewSubject(subject: Subject): Long {
+        return databaseDao.addSubject(subject)
     }
 
     suspend fun updateTask(task: Task) {
-        dataSource.updateTask(task)
+        databaseDao.updateTask(task)
     }
 
     suspend fun deleteAllTempTasks() {
-        dataSource.deleteAllTempTasks()
+        databaseDao.deleteAllTempTasks()
     }
-    fun getAllTasks(): Flow<List<Task>> {
-        return dataSource.getAllTasks()
+    fun getAllTasks(): Flow<List<ModelTask>> {
+        return databaseDao.getAllTasks()
     }
 
     suspend fun getSubjectNameById(id: Int): String {
-        return dataSource.getSubjectNameById(id)
+        return databaseDao.getSubjectNameById(id)
     }
 
     fun getAllTempTasks(): Flow<List<TempTask>> {
-        return dataSource.getAllTempTasks()
+        return databaseDao.getAllTempTasks()
     }
 
     suspend fun deleteTask(task: Task) {
-        dataSource.deleteTask(task)
+        databaseDao.deleteTask(task)
     }
 
     suspend fun copyFromTasksToTempTasks() {
-        dataSource.copyFromTasksToTempTasks()
+        databaseDao.copyFromTasksToTempTasks()
     }
 
 }

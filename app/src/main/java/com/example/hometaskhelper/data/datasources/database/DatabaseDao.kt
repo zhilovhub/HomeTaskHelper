@@ -97,4 +97,13 @@ interface DatabaseDao {
 //    suspend fun copyFromTempTaskToTasks() // TODO SELECT AND UPDATE IN ONE QUERY
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
     suspend fun deleteAllRedactingTasks()
+
+    @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = 0")
+    suspend fun updateTasksIsRedacting()
+
+    @Query("UPDATE ${Task.TABLE_NAME} SET is_deleted = 0")
+    suspend fun updateTasksIsDeleted()
+
+    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
+    suspend fun deleteDeletedTasks()
 }

@@ -70,8 +70,17 @@ class MainViewModel(
             for (tempTask in tempTasks) {
                 repository.updateTask(tempTask.toTask())
             }
+            repository.updateTasksIsDeleted()
             repository.deleteAllTempTasks()
             repository.deleteAllRedactingTasks()
+        }
+    }
+
+    fun acceptRedacting() {
+        coroutineScope.launch {
+            repository.deleteDeletedTasks()
+            repository.updateTasksIsRedacting()
+            repository.deleteAllTempTasks()
         }
     }
 
@@ -90,9 +99,8 @@ class MainViewModel(
     fun updateUserState(newState: UserState) {
         if (newState != _userState.value){
             _userState.value = newState
-            when (newState) {
-                UserState.DEFAULT -> cancelRedacting()
-                else -> tempSaveCurrentTasks()
+            if (_userState.value != UserState.DELETING) {
+                tempSaveCurrentTasks()
             }
         }
     }

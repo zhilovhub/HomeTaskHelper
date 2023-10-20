@@ -64,13 +64,14 @@ fun AcceptCancel(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    val action = { viewModel.updateUserState(UserState.DEFAULT) }
-
     Row(
         modifier = modifier,
     ) {
         IconButton(
-            onClick = action
+            onClick = {
+                viewModel.acceptRedacting()
+                viewModel.updateUserState(UserState.DEFAULT)
+            }
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_check_circle_24),
@@ -78,7 +79,10 @@ fun AcceptCancel(
             )
         }
         IconButton(
-            onClick = action
+            onClick = {
+                viewModel.cancelRedacting()
+                viewModel.updateUserState(UserState.DEFAULT)
+            }
         ) {
             Image(
                 painter = painterResource(R.drawable.baseline_cancel_24),

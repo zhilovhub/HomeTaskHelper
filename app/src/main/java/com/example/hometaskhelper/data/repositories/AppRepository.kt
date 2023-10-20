@@ -44,5 +44,17 @@ class AppRepository(
     suspend fun deleteAllRedactingTasks() {
         databaseDao.deleteAllRedactingTasks()
     }
+
+    suspend fun updateTasksIsRedacting() {
+        databaseDao.updateTasksIsRedacting()
+    }
+
+    suspend fun updateTasksIsDeleted() {
+        databaseDao.updateTasksIsDeleted()
+    }
+
+    suspend fun deleteDeletedTasks() {
+        databaseDao.deleteDeletedTasks()
+    }
 }
 

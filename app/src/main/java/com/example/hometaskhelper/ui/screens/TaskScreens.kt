@@ -99,7 +99,7 @@ fun Task(userState: UserState,
                         if (userState == UserState.DELETING) {
                             IconButton(
                                 modifier = Modifier.align(Alignment.TopEnd),
-                                onClick = {  }
+                                onClick = { viewModel.deleteTask(task) }
                             ) {
                                 Image(
                                     painter = painterResource(R.drawable.baseline_delete_24),

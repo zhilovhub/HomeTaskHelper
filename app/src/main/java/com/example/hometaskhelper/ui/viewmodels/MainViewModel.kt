@@ -58,14 +58,20 @@ class MainViewModel(
                 description = "",
                 toDate = "",
                 isRedacting = true,
-                isFinished = false
+                isFinished = false,
+                isDeleted = false
             ))
         }
     }
 
-    fun deleteAllTempTasks() {
+    fun cancelRedacting() {
         coroutineScope.launch {
+            val tempTasks = repository.getAllTempTasks()
+            for (tempTask in tempTasks) {
+                repository.updateTask(tempTask.toTask())
+            }
             repository.deleteAllTempTasks()
+            repository.deleteAllRedactingTasks()
         }
     }
 
@@ -73,17 +79,11 @@ class MainViewModel(
         return repository.getAllTasks()
     }
 
-    fun deleteTask(task: Task) {
+    fun deleteTask(task: ModelTask) {
         coroutineScope.launch {
-            repository.deleteTask(task)
-        }
-    }
-
-    fun updateTasks(tasks: List<Task>) {
-        coroutineScope.launch {
-            for (task in tasks) {
-                repository.updateTask(task)
-            }
+            repository.updateTask(
+                task.toTask().copy(isDeleted = true)
+            )
         }
     }
 
@@ -91,7 +91,7 @@ class MainViewModel(
         if (newState != _userState.value){
             _userState.value = newState
             when (newState) {
-                UserState.DEFAULT -> deleteAllTempTasks()
+                UserState.DEFAULT -> cancelRedacting()
                 else -> tempSaveCurrentTasks()
             }
         }
@@ -99,7 +99,7 @@ class MainViewModel(
     
     override fun onCleared() {
         super.onCleared()
-        deleteAllTempTasks()
+        cancelRedacting()
         coroutineScope.cancel()
     }
 

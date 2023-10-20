@@ -36,21 +36,11 @@ data class Task(
 
     @ColumnInfo(name = "is_finished", defaultValue = "false")
     val isFinished: Boolean,
+
+    @ColumnInfo(name = "is_deleted", defaultValue = "false")
+    val isDeleted: Boolean
 ) {
     companion object {
         const val TABLE_NAME = "Tasks"
     }
-}
-
-
-fun Task.toTempTask(): TempTask {
-    return TempTask(
-        id = 0,
-        taskId = this.id,
-        subjectId = this.subjectId,
-        description = this.description,
-        toDate = this.toDate,
-        isRedacting = this.isRedacting,
-        isFinished = this.isFinished
-    )
 }

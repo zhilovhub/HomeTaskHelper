@@ -61,7 +61,7 @@ interface DatabaseDao {
     suspend fun getTasksOfSubject(subjectId: Int): List<Task>
 
     @Query("SELECT t1.*, t2.subject_name FROM ${Task.TABLE_NAME} as t1 " +
-           "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id")
+           "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id WHERE t1.is_deleted = 0")
     fun getAllTasks(): Flow<List<ModelTask>>
 
     @Insert
@@ -77,10 +77,24 @@ interface DatabaseDao {
     suspend fun deleteAllTempTasks()
 
     @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
-    fun getAllTempTasks(): Flow<List<TempTask>>
+    suspend fun getAllTempTasks(): List<TempTask>
 
     @Query("INSERT INTO ${TempTask.TABLE_NAME} " +
             "(id, task_id, subject_id, description, to_date, is_redacting, is_finished) " +
             "SELECT null, id, subject_id, description, to_date, is_redacting, is_finished FROM ${Task.TABLE_NAME}")
     suspend fun copyFromTasksToTempTasks()
+
+//    @Query("UPDATE t1 SET " +
+//            "t1.id = t2.id," +
+//            "t1.subject_id = t2.subject_id, " +
+//            "t1.description = t2.description, " +
+//            "t1.to_date = t2.to_date, " +
+//            "t1.is_redacting = t2.is_redacting, " +
+//            "t1.is_finished = t2.is_finished, " +
+//            "FROM ${Task.TABLE_NAME} as t1 " +
+//            "INNER JOIN ${TempTask.TABLE_NAME} as t2" +
+//            "ON t1.id = t2.id")
+//    suspend fun copyFromTempTaskToTasks() // TODO SELECT AND UPDATE IN ONE QUERY
+    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
+    suspend fun deleteAllRedactingTasks()
 }

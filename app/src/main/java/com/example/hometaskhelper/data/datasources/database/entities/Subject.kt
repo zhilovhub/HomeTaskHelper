@@ -13,6 +13,9 @@ data class Subject(
     @ColumnInfo(name = "subject_name")
     val subjectName: String,
 
+    @ColumnInfo(name = "new_subject_name", defaultValue = "")
+    val newSubjectName: String,
+
     @ColumnInfo(name = "aliases")
     val aliases: String
 ) {

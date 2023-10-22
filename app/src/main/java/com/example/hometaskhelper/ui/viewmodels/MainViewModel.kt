@@ -1,6 +1,10 @@
 package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
@@ -11,11 +15,17 @@ import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val repository: AppRepository
@@ -49,6 +59,7 @@ class MainViewModel(
                 Subject(
                     id = 0,
                     "Новый",
+                    "Новый",
                     ""
                 )
             )
@@ -70,6 +81,8 @@ class MainViewModel(
             for (tempTask in tempTasks) {
                 repository.updateTask(tempTask.toTask())
             }
+            val subjectsId = repository.getSubjectsIdFromTasks()
+            repository.resetSubjectNewNames(subjectsId)
             repository.updateTasksIsDeleted()
             repository.deleteAllTempTasks()
             repository.deleteAllRedactingTasks()
@@ -78,6 +91,8 @@ class MainViewModel(
 
     fun acceptRedacting() {
         coroutineScope.launch {
+            val subjectsId = repository.getSubjectsIdFromTasks()
+            repository.updateSubjectNames(subjectsId)
             repository.deleteDeletedTasks()
             repository.updateTasksIsRedacting()
             repository.deleteAllTempTasks()
@@ -99,7 +114,7 @@ class MainViewModel(
     fun updateUserState(newState: UserState) {
         if (newState != _userState.value){
             _userState.value = newState
-            if (_userState.value != UserState.DELETING) {
+            if (_userState.value != UserState.DEFAULT) {
                 tempSaveCurrentTasks()
             }
         }

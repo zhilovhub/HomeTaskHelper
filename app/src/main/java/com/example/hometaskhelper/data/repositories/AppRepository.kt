@@ -1,6 +1,5 @@
 package com.example.hometaskhelper.data.repositories
 
-import android.util.Log
 import com.example.hometaskhelper.data.datasources.database.DatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
@@ -55,6 +54,18 @@ class AppRepository(
 
     suspend fun deleteDeletedTasks() {
         databaseDao.deleteDeletedTasks()
+    }
+
+    suspend fun getSubjectsIdFromTasks(): List<Long> {
+        return databaseDao.getSubjectsIdFromTasks()
+    }
+
+    suspend fun resetSubjectNewNames(subjectsId: List<Long>) {
+        databaseDao.resetSubjectNewNames(subjectsId)
+    }
+
+    suspend fun updateSubjectNames(subjectsId: List<Long>) {
+        databaseDao.updateSubjectNames(subjectsId)
     }
 }
 

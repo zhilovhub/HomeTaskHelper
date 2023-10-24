@@ -59,8 +59,7 @@ class MainViewModel(
                 Subject(
                     id = 0,
                     "Новый",
-                    "Новый",
-                    ""
+                    "Новый"
                 )
             )
             repository.addTask(Task(
@@ -81,8 +80,6 @@ class MainViewModel(
             for (tempTask in tempTasks) {
                 repository.updateTask(tempTask.toTask())
             }
-            val subjectsId = repository.getSubjectsIdFromTasks()
-            repository.resetSubjectNewNames(subjectsId)
             repository.updateTasksIsDeleted()
             repository.deleteAllTempTasks()
             repository.deleteAllRedactingTasks()
@@ -91,8 +88,8 @@ class MainViewModel(
 
     fun acceptRedacting() {
         coroutineScope.launch {
-            val subjectsId = repository.getSubjectsIdFromTasks()
-            repository.updateSubjectNames(subjectsId)
+
+//          TODO update subject_name of tasks with is_redacting = 1
             repository.deleteDeletedTasks()
             repository.updateTasksIsRedacting()
             repository.deleteAllTempTasks()

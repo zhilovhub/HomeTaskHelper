@@ -106,13 +106,4 @@ interface DatabaseDao {
 
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
     suspend fun deleteDeletedTasks()
-
-    @Query("SELECT subject_id FROM ${Task.TABLE_NAME}")
-    suspend fun getSubjectsIdFromTasks(): List<Long>
-
-    @Query("UPDATE ${Subject.TABLE_NAME} SET new_subject_name = subject_name WHERE id in (:subjectIds)")
-    suspend fun resetSubjectNewNames(subjectIds: List<Long>)
-
-    @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = new_subject_name WHERE id in (:subjectIds)")
-    suspend fun updateSubjectNames(subjectIds: List<Long>)
 }

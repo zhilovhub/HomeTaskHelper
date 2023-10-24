@@ -55,17 +55,5 @@ class AppRepository(
     suspend fun deleteDeletedTasks() {
         databaseDao.deleteDeletedTasks()
     }
-
-    suspend fun getSubjectsIdFromTasks(): List<Long> {
-        return databaseDao.getSubjectsIdFromTasks()
-    }
-
-    suspend fun resetSubjectNewNames(subjectsId: List<Long>) {
-        databaseDao.resetSubjectNewNames(subjectsId)
-    }
-
-    suspend fun updateSubjectNames(subjectsId: List<Long>) {
-        databaseDao.updateSubjectNames(subjectsId)
-    }
 }
 

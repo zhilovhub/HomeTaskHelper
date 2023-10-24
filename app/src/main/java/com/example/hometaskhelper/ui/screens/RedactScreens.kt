@@ -69,6 +69,7 @@ fun AcceptCancel(
     ) {
         IconButton(
             onClick = {
+                // TODO make accept works properly
                 viewModel.acceptRedacting()
                 viewModel.updateUserState(UserState.DEFAULT)
             }

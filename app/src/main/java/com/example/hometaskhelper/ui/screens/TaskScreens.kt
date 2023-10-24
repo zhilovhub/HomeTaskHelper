@@ -15,8 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,21 +31,15 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 
 @Composable
 fun Tasks(userState: UserState,
-          tasks: List<ModelTask>,
+          tasks: SnapshotStateList<ModelTask>,
           viewModel: MainViewModel,
           modifier: Modifier = Modifier
 ) {
-    val tasksRemembered = remember { mutableStateListOf(*tasks.toTypedArray()) }
-    if (tasksRemembered.size != tasks.size) {
-        tasksRemembered.removeRange(0, tasksRemembered.size)
-        tasksRemembered.addAll(tasks)
-    }
-
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(tasksRemembered) {index, task ->
+        itemsIndexed(tasks) {index, task ->
             Task(
                 subjectName = task.subjectName,
                 taskDescription = task.description,
@@ -57,16 +50,16 @@ fun Tasks(userState: UserState,
                 },
                 updateSubjectName = {
                     // TODO update subject_name in ModelTask
-                    tasksRemembered[index] = tasksRemembered[index].copy(subjectName = it)
+                    tasks[index] = tasks[index].copy(subjectName = it)
                 },
                 updateTaskDescription = {
-                    tasksRemembered[index] = tasksRemembered[index].copy(description = it)
+                    tasks[index] = tasks[index].copy(description = it)
                 },
                 updateTaskIsFinished = {
-                    tasksRemembered[index] = tasksRemembered[index].copy(isFinished = it)
+                    tasks[index] = tasks[index].copy(isFinished = it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(tasksRemembered[index])
+                    viewModel.deleteTask(tasks[index])
                 }
             )
         }

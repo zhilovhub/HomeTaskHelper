@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +35,12 @@ fun HomeScreen(
     val tasksState by viewModel.tasksState.collectAsState()
     val userState by viewModel.userState.collectAsState()
 
+    val tasksRemembered = remember { mutableStateListOf(*tasksState.toTypedArray()) }
+    if (tasksRemembered.size != tasksState.size) {
+        tasksRemembered.removeRange(0, tasksRemembered.size)
+        tasksRemembered.addAll(tasksState)
+    }
+
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -54,7 +62,7 @@ fun HomeScreen(
                 )
                 Tasks(
                     userState = userState,
-                    tasks = tasksState,
+                    tasks = tasksRemembered,
                     viewModel = viewModel,
                     modifier = Modifier.weight(1f)
                 )

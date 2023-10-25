@@ -55,5 +55,9 @@ class AppRepository(
     suspend fun deleteDeletedTasks() {
         databaseDao.deleteDeletedTasks()
     }
+
+    suspend fun updateSubjectName(subjectId: Int, subjectName: String) {
+        databaseDao.updateSubjectName(subjectId, subjectName)
+    }
 }
 

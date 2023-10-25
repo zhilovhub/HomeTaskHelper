@@ -80,17 +80,22 @@ class MainViewModel(
             for (tempTask in tempTasks) {
                 repository.updateTask(tempTask.toTask())
             }
+            // TODO something strange with isRedacting in TempTasks
             repository.updateTasksIsDeleted()
             repository.deleteAllTempTasks()
             repository.deleteAllRedactingTasks()
         }
     }
 
-    fun acceptRedacting() {
+    fun acceptRedacting(tasks: List<ModelTask>) {
         coroutineScope.launch {
-
-//          TODO update subject_name of tasks with is_redacting = 1
             repository.deleteDeletedTasks()
+            for (task in tasks) {
+                if (task.isRedacting) {
+                    repository.updateSubjectName(task.subjectId, task.subjectName)
+                    repository.updateTask(task.toTask().copy(isRedacting = false))
+                }
+            }
             repository.updateTasksIsRedacting()
             repository.deleteAllTempTasks()
         }
@@ -114,6 +119,12 @@ class MainViewModel(
             if (_userState.value != UserState.DEFAULT) {
                 tempSaveCurrentTasks()
             }
+        }
+    }
+
+    fun updateTask(task: Task) {
+        coroutineScope.launch {
+            repository.updateTask(task)
         }
     }
     

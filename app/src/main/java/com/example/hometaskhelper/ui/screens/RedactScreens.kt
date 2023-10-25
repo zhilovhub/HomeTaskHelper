@@ -9,10 +9,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.hometaskhelper.R
+import com.example.hometaskhelper.ui.models.ModelTask
 import com.example.hometaskhelper.ui.viewmodels.MainViewModel
 import com.example.hometaskhelper.ui.viewmodels.UserState
 
@@ -61,7 +63,9 @@ fun RedactTasks(
 
 @Composable
 fun AcceptCancel(
-    viewModel: MainViewModel,
+    updateUserState: (UserState) -> Unit,
+    onAcceptRedacting: () -> Unit,
+    onCancelRedacting: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -69,9 +73,8 @@ fun AcceptCancel(
     ) {
         IconButton(
             onClick = {
-                // TODO make accept works properly
-                viewModel.acceptRedacting()
-                viewModel.updateUserState(UserState.DEFAULT)
+                onAcceptRedacting()
+                updateUserState(UserState.DEFAULT)
             }
         ) {
             Image(
@@ -81,8 +84,8 @@ fun AcceptCancel(
         }
         IconButton(
             onClick = {
-                viewModel.cancelRedacting()
-                viewModel.updateUserState(UserState.DEFAULT)
+                onCancelRedacting()
+                updateUserState(UserState.DEFAULT)
             }
         ) {
             Image(

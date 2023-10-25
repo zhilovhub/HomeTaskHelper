@@ -106,4 +106,7 @@ interface DatabaseDao {
 
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
     suspend fun deleteDeletedTasks()
+
+    @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
+    suspend fun updateSubjectName(subjectId: Int, subjectName: String)
 }

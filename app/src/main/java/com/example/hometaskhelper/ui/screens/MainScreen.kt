@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +37,7 @@ fun HomeScreen(
     val userState by viewModel.userState.collectAsState()
 
     val tasksRemembered = remember { mutableStateListOf(*tasksState.toTypedArray()) }
-    if (tasksRemembered.size != tasksState.size) {
+    if (tasksRemembered.size != tasksState.size) { // TODO Нормальное обновление при изменении кол-ва данных
         tasksRemembered.removeRange(0, tasksRemembered.size)
         tasksRemembered.addAll(tasksState)
     }
@@ -73,7 +74,15 @@ fun HomeScreen(
             }
             if (userState != UserState.DEFAULT) {
                 AcceptCancel(
-                    viewModel = viewModel,
+                    updateUserState = {
+                        viewModel.updateUserState(it)
+                    },
+                    onAcceptRedacting = {
+                        viewModel.acceptRedacting(tasksRemembered)
+                    },
+                    onCancelRedacting = {
+                        viewModel.cancelRedacting()
+                    },
                     modifier = Modifier.align(Alignment.TopEnd)
                 )
             }

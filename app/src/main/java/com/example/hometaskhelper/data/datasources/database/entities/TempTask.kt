@@ -34,6 +34,9 @@ data class TempTask(
     @ColumnInfo(name = "subject_id")
     val subjectId: Int,
 
+    @ColumnInfo(name = "subject_name", defaultValue = "")
+    val subjectName: String,
+
     @ColumnInfo(name = "description")
     val description: String,
 

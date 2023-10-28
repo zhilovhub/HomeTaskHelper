@@ -13,6 +13,7 @@ data class ModelTask(
     @ColumnInfo(name = "to_date") val toDate: String,
     @ColumnInfo(name = "is_redacting") val isRedacting: Boolean,
     @ColumnInfo(name = "is_finished") val isFinished: Boolean,
+    @ColumnInfo(name = "is_deleted") val isDeleted: Boolean
 ) {
     fun toTask(): Task {
         return Task(

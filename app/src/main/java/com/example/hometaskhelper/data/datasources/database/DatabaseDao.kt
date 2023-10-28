@@ -61,7 +61,7 @@ interface DatabaseDao {
     suspend fun getTasksOfSubject(subjectId: Int): List<Task>
 
     @Query("SELECT t1.*, t2.subject_name FROM ${Task.TABLE_NAME} as t1 " +
-           "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id WHERE t1.is_deleted = 0")
+           "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id")
     fun getAllTasks(): Flow<List<ModelTask>>
 
     @Insert

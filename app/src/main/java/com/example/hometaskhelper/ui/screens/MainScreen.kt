@@ -91,9 +91,11 @@ fun HomeScreen(
                         viewModel.updateUserState(it)
                     },
                     onAcceptRedacting = {
+                        // TODO isRedacting = false in tasksRemembered
                         viewModel.acceptRedacting(tasksRemembered.values.toMutableStateList())
                     },
                     onCancelRedacting = {
+                        // TODO isRedacting = false in tasksRemembered
                         viewModel.cancelRedacting()
                     },
                     modifier = Modifier.align(Alignment.TopEnd)

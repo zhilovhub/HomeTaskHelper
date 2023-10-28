@@ -51,15 +51,15 @@ fun Tasks(
                 },
                 updateSubjectName = {
                     if (!tasks[task.id]!!.isRedacting) {
-                        tasks[task.id] = tasks[task.id]!!.copy(isRedacting = true)
+                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
                     }
-                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it)
+                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
                 },
                 updateTaskDescription = {
                     if (!tasks[task.id]!!.isRedacting) {
-                        tasks[task.id] = tasks[task.id]!!.copy(isRedacting = true)
+                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
                     }
-                    tasks[task.id] = tasks[task.id]!!.copy(description = it)
+                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)
                 },
                 updateTaskIsFinished = {
                     tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)

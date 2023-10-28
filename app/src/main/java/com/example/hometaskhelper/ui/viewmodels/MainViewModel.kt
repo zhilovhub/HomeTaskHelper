@@ -78,9 +78,8 @@ class MainViewModel(
         coroutineScope.launch {
             val tempTasks = repository.getAllTempTasks()
             for (tempTask in tempTasks) {
-                repository.updateTask(tempTask.toTask())
+                repository.updateTask(tempTask.toTask().copy(isRedacting = false))
             }
-            // TODO something strange with isRedacting in TempTasks
             repository.updateTasksIsDeleted()
             repository.deleteAllTempTasks()
             repository.deleteAllRedactingTasks()

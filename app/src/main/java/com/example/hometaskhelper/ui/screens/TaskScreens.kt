@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,7 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -30,16 +30,17 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 
 
 @Composable
-fun Tasks(userState: UserState,
-          tasks: SnapshotStateList<ModelTask>,
-          viewModel: MainViewModel,
-          modifier: Modifier = Modifier
+fun Tasks(
+    userState: UserState,
+    tasks: SnapshotStateMap<Int, ModelTask>,
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(tasks) {index, task ->
+        items(tasks.values.toList()) {task ->
             Task(
                 subjectName = task.subjectName,
                 taskDescription = task.description,
@@ -49,17 +50,22 @@ fun Tasks(userState: UserState,
                     viewModel.updateUserState(it)
                 },
                 updateSubjectName = {
-                    // TODO update subject_name in ModelTask
-                    tasks[index] = tasks[index].copy(subjectName = it)
+                    if (!tasks[task.id]!!.isRedacting) {
+                        tasks[task.id] = tasks[task.id]!!.copy(isRedacting = true)
+                    }
+                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it)
                 },
                 updateTaskDescription = {
-                    tasks[index] = tasks[index].copy(description = it)
+                    if (!tasks[task.id]!!.isRedacting) {
+                        tasks[task.id] = tasks[task.id]!!.copy(isRedacting = true)
+                    }
+                    tasks[task.id] = tasks[task.id]!!.copy(description = it)
                 },
                 updateTaskIsFinished = {
-                    tasks[index] = tasks[index].copy(isFinished = it)
+                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(tasks[index])
+                    viewModel.deleteTask(tasks[task.id]!!)
                 }
             )
         }

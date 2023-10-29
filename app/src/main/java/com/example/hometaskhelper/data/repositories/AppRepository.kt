@@ -2,6 +2,7 @@ package com.example.hometaskhelper.data.repositories
 
 import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Task
+import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.network.SQLApi
 import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.flow.Flow
@@ -40,8 +41,8 @@ class AppRepository(
         databaseDao.updateSubjectName(subjectId, subjectName)
     }
 
-    suspend fun copyFromTasksToTempTasks() {
-        databaseDao.selectFromTasksInsertToTempTasks()
+    suspend fun insertToTempTasks(tasks: List<TempTask>) {
+        databaseDao.insertToTempTasks(tasks)
     }
 
     // Network

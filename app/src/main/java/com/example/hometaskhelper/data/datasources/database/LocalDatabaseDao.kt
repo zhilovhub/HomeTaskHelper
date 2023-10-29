@@ -89,10 +89,8 @@ interface LocalDatabaseDao {
     @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
     suspend fun selectAllTempTasks(): List<TempTask>
 
-    @Query("INSERT INTO ${TempTask.TABLE_NAME} " +
-            "(id, task_id, subject_id, description, to_date, is_redacting, is_finished) " +
-            "SELECT null, id, subject_id, description, to_date, is_redacting, is_finished FROM ${Task.TABLE_NAME}")
-    suspend fun selectFromTasksInsertToTempTasks()
+    @Insert
+    suspend fun insertToTempTasks(tasks: List<TempTask>)
 
     // INSERT
     @Insert

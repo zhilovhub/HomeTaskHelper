@@ -41,8 +41,8 @@ class MainViewModel(
         }
     }
 
-    fun tempSaveCurrentTasks() {
-        coroutineScope.launch { repository.copyFromTasksToTempTasks() }
+    fun tempSaveCurrentTasks(tasks: List<ModelTask>) {
+        coroutineScope.launch { repository.insertToTempTasks(tasks.map { it.toTempTask() }) }
     }
 
     fun addNewTask() {
@@ -83,7 +83,7 @@ class MainViewModel(
         if (newState != _userState.value){
             _userState.value = newState
             if (_userState.value != UserState.DEFAULT) {
-                tempSaveCurrentTasks()
+//                tempSaveCurrentTasks()
             }
         }
     }

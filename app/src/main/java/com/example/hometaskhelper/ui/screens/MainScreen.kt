@@ -81,6 +81,7 @@ fun HomeScreen(
                 Tasks(
                     userState = userState,
                     tasks = tasksState.tasks,
+                    subjects = tasksState.subjects,
                     viewModel = viewModel,
                     modifier = Modifier.weight(1f)
                 )

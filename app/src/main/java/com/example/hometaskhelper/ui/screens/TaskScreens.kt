@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hometaskhelper.R
+import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask
 import com.example.hometaskhelper.ui.viewmodels.MainViewModel
 import com.example.hometaskhelper.ui.viewmodels.UserState
@@ -35,6 +36,7 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 fun Tasks(
     userState: UserState,
     tasks: List<ModelTask>,
+    subjects: Map<Int, ModelSubject>,
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -44,7 +46,7 @@ fun Tasks(
     ) {
         itemsIndexed(tasks) {index, task ->
             Task(
-                subjectName = task.subjectName,
+                subjectName = subjects[task.subjectId]?.subjectName ?: "",
                 taskDescription = task.description,
                 taskIsFinished = task.isFinished,
                 userState = userState,

@@ -2,10 +2,9 @@ package com.example.hometaskhelper.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.hometaskhelper.data.datasources.database.AppDatabase
-import com.example.hometaskhelper.data.datasources.database.DatabaseDao
-import com.example.hometaskhelper.data.datasources.database.TestNetworkDao
-import com.example.hometaskhelper.data.datasources.database.TestNetworkDatabase
+import com.example.hometaskhelper.data.datasources.database.LocalDatabase
+import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
+import com.example.hometaskhelper.data.datasources.database.HostDatabase
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -16,32 +15,25 @@ class DatabaseModule(val context: Context) {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(): AppDatabase {
+    fun provideAppDatabase(): LocalDatabase {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "teletask_database"
+            LocalDatabase::class.java, "teletask_database"
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideAppDatabaseDao(database: AppDatabase): DatabaseDao {
+    fun provideAppDatabaseDao(database: LocalDatabase): LocalDatabaseDao {
         return database.databaseDao()
     }
 
     @Provides
     @Singleton
-    fun provideTestNetworkDatabase(): TestNetworkDatabase {
+    fun provideTestNetworkDatabase(): HostDatabase {
         return Room.databaseBuilder(
             context,
-            TestNetworkDatabase::class.java, "teletask_database_network"
+            HostDatabase::class.java, "teletask_database_network"
         ).build()
     }
-
-    @Provides
-    @Singleton
-    fun provideTestNetworkDao(database: TestNetworkDatabase): TestNetworkDao {
-        return database.TestNetworkDao()
-    }
-
 }

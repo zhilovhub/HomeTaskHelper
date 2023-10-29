@@ -2,7 +2,6 @@ package com.example.hometaskhelper.ui.models
 
 import androidx.room.ColumnInfo
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 
 
 data class ModelTask(

@@ -1,6 +1,6 @@
 package com.example.hometaskhelper.data.repositories
 
-import com.example.hometaskhelper.data.datasources.database.DatabaseDao
+import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.network.SQLApi
 import com.example.hometaskhelper.ui.models.ModelTask
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 class AppRepository(
-    private val databaseDao: DatabaseDao,
+    private val databaseDao: LocalDatabaseDao,
     private val sqlApi: SQLApi
 ) {
     // Local

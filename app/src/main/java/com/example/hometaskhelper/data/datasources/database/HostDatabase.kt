@@ -6,16 +6,15 @@ import com.example.hometaskhelper.data.datasources.database.entities.Auth
 import com.example.hometaskhelper.data.datasources.database.entities.OneTimeKey
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
 
 @Database(
-    entities = [Auth::class, Task::class, User::class, Subject::class, OneTimeKey::class, TempTask::class],
-    version = 11,
+    entities = [Auth::class, Task::class, User::class, Subject::class, OneTimeKey::class],
+    version = 1,
     exportSchema = true
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class HostDatabase : RoomDatabase() {
 
-    abstract fun databaseDao(): DatabaseDao
+//    abstract fun TestNetworkDao(): TestNetworkDao
 
 }

@@ -14,7 +14,7 @@ import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface DatabaseDao {
+interface LocalDatabaseDao {
 
     // TRANSACTIONS
     @Transaction

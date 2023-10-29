@@ -86,13 +86,14 @@ class MainViewModel(
         }
     }
 
-    fun acceptRedacting(tasks: List<ModelTask>) {
+    fun acceptRedacting(tasks: List<ModelTask>, changeLocalIsRedacting: (Int) -> Unit) {
         coroutineScope.launch {
             repository.deleteDeletedTasks()
             for (task in tasks) {
                 if (task.isRedacting) {
                     repository.updateSubjectName(task.subjectId, task.subjectName)
                     repository.updateTask(task.toTask().copy(isRedacting = false))
+                    changeLocalIsRedacting(task.id)
                 }
             }
             repository.updateTasksIsRedacting()

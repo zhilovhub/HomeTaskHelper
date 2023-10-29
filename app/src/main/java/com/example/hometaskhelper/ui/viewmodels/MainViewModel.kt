@@ -34,11 +34,15 @@ class MainViewModel(
 
     init {
         coroutineScope.launch {
-            repository.getAllTasks().collect {
-                _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = it) }
+            repository.getAllTasks().collect { newTasks ->
+                println(newTasks.toString())
+                _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = newTasks) }
             }
-            repository.getAllSubjects().collect {
-                _tasksState.update { tasksUiState -> tasksUiState.copy(subjects = mapOf(*it.map { it.id to it }.toTypedArray())) }
+        }
+        coroutineScope.launch {
+            repository.getAllSubjects().collect {newSubjects ->
+                println(newSubjects.toString())
+                _tasksState.update { tasksUiState -> tasksUiState.copy(subjects = mapOf(*newSubjects.map { it.id to it }.toTypedArray())) }
             }
         }
     }

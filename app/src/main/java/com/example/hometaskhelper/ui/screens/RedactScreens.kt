@@ -22,7 +22,8 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 @Composable
 fun RedactTasks(
     userState: UserState,
-    viewModel: MainViewModel,
+    onUpdateUserState: (UserState) -> Unit,
+    onAddTask: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val (addEnable, deleteEnable) = when (userState) {
@@ -39,8 +40,8 @@ fun RedactTasks(
             modifier = Modifier,
             enabled = addEnable,
             onClick = {
-                viewModel.updateUserState(UserState.REDACTING)
-                viewModel.addNewTask()
+                onUpdateUserState(UserState.REDACTING)
+                onAddTask()
             }
         ) {
             Text("Добавить")
@@ -52,7 +53,7 @@ fun RedactTasks(
             modifier = Modifier,
             enabled = deleteEnable,
             onClick = {
-                viewModel.updateUserState(UserState.DELETING)
+                onUpdateUserState(UserState.DELETING)
             }
         ) {
             Text("Удалить")

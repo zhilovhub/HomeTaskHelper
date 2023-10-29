@@ -10,6 +10,7 @@ import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
+import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.flow.Flow
 
@@ -82,9 +83,11 @@ interface LocalDatabaseDao {
     @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE subject_id = :subjectId")
     suspend fun selectTasksOfSubject(subjectId: Int): List<Task>
 
-    @Query("SELECT t1.*, t2.subject_name FROM ${Task.TABLE_NAME} as t1 " +
-            "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id")
+    @Query("SELECT * FROM ${Task.TABLE_NAME}")
     fun selectAllTasks(): Flow<List<ModelTask>>
+
+    @Query("SELECT * FROM ${Subject.TABLE_NAME}")
+    fun selectAllSubjects(): Flow<List<ModelSubject>>
 
     @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
     suspend fun selectAllTempTasks(): List<TempTask>

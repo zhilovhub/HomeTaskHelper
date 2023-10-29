@@ -37,15 +37,9 @@ fun HomeScreen(
     viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(LocalContext.current.applicationContext))
 ) {
     val tasksState by viewModel.tasksState.collectAsState()
-    val subjectsState by viewModel.subjectsState.collectAsState()
     val userState by viewModel.userState.collectAsState()
 
-    val tasksRemembered = remember {
-        mutableStateListOf(*tasksState.toTypedArray()
-    ) }
-    val subjectsRemembered = remember {
-        mutableStateMapOf(*subjectsState.map { it.id to it }.toTypedArray())
-    }
+    println(tasksState.tasks)
 
 //    if (tasksState.map { it.id to it } != tasksRemembered) {
 //        for (taskId in tasksRemembered.keys.minus(tasksState.map { it.id }.toSet())) {  // Deleting task
@@ -86,13 +80,18 @@ fun HomeScreen(
                 )
                 Tasks(
                     userState = userState,
-                    tasks = tasksRemembered,
+                    tasks = tasksState.tasks,
                     viewModel = viewModel,
                     modifier = Modifier.weight(1f)
                 )
                 RedactTasks(
                     userState = userState,
-                    viewModel = viewModel
+                    onUpdateUserState = {
+                        viewModel.updateUserState(userState)
+                    },
+                    onAddTask = {
+                        viewModel.addNewTask()
+                    }
                 )
             }
             if (userState != UserState.DEFAULT) {

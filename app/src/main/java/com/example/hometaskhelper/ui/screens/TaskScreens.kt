@@ -34,7 +34,7 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 @Composable
 fun Tasks(
     userState: UserState,
-    tasks: SnapshotStateList<ModelTask>,
+    tasks: List<ModelTask>,
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {

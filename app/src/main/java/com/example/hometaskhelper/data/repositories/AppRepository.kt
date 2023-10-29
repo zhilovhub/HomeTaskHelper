@@ -4,6 +4,7 @@ import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.network.SQLApi
+import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.flow.Flow
 
@@ -31,6 +32,10 @@ class AppRepository(
 
     fun getAllTasks(): Flow<List<ModelTask>> {
         return databaseDao.selectAllTasks()
+    }
+
+    fun getAllSubjects(): Flow<List<ModelSubject>> {
+        return databaseDao.selectAllSubjects()
     }
 
     suspend fun updateTask(task: Task) {

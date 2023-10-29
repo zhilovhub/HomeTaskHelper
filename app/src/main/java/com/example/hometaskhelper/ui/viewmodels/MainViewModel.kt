@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
+import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
 import com.example.hometaskhelper.ui.models.ModelSubject
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -24,25 +26,25 @@ class MainViewModel(
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private val _tasksState = MutableStateFlow(emptyList<ModelTask>())
-    val tasksState: StateFlow<List<ModelTask>> = _tasksState.asStateFlow()
-
-    private val _subjectsState = MutableStateFlow(emptyList<ModelSubject>())
-    val subjectsState: StateFlow<List<ModelSubject>> = _subjectsState.asStateFlow()
+    private val _tasksState = MutableStateFlow(TasksUiState(tasks = listOf(), subjects = mapOf()))
+    val tasksState: StateFlow<TasksUiState> = _tasksState.asStateFlow()
 
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
     init {
         coroutineScope.launch {
-            getAllTasks().collect {
-                _tasksState.value = it
+            repository.getAllTasks().collect {
+                _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = it) }
+            }
+            repository.getAllSubjects().collect {
+                _tasksState.update { tasksUiState -> tasksUiState.copy(subjects = mapOf(*it.map { it.id to it }.toTypedArray())) }
             }
         }
     }
 
-    fun tempSaveCurrentTasks(tasks: List<ModelTask>) {
-        coroutineScope.launch { repository.insertToTempTasks(tasks.map { it.toTempTask() }) }
+    private fun tempSaveCurrentTasks() {
+        coroutineScope.launch { repository.insertToTempTasks(_tasksState.value.tasks.map { it.toTempTask() }) }
     }
 
     fun addNewTask() {
@@ -59,7 +61,7 @@ class MainViewModel(
                 if (task.isRedacting) {
                     repository.updateSubjectNameAndTask(
                         task.subjectId,
-                        task.subjectName,
+                        _tasksState.value.subjects[task.subjectId]?.subjectName ?: "",
                         task.toTask().copy(isRedacting = false)
                     )
                     withContext(Dispatchers.Main) {
@@ -71,10 +73,6 @@ class MainViewModel(
         }
     }
 
-    fun getAllTasks(): Flow<List<ModelTask>> {
-        return repository.getAllTasks()
-    }
-
     fun deleteTask(task: ModelTask) {
         coroutineScope.launch { repository.updateTask(task.toTask().copy(isDeleted = true)) }
     }
@@ -83,7 +81,7 @@ class MainViewModel(
         if (newState != _userState.value){
             _userState.value = newState
             if (_userState.value != UserState.DEFAULT) {
-//                tempSaveCurrentTasks()
+                tempSaveCurrentTasks()
             }
         }
     }
@@ -113,3 +111,8 @@ enum class UserState {
     REDACTING,
     DELETING
 }
+
+data class TasksUiState(
+    val tasks: List<ModelTask>,
+    val subjects: Map<Int, ModelSubject>
+)

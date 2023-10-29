@@ -14,11 +14,11 @@ class AppRepository(
     private val sqlApi: SQLApi
 ) {
     suspend fun addTask(task: Task) {
-        return databaseDao.addTask(task)
+        return databaseDao.insertTask(task)
     }
 
     suspend fun addNewSubject(subject: Subject): Long {
-        return databaseDao.addSubject(subject)
+        return databaseDao.insertSubject(subject)
     }
 
     suspend fun updateTask(task: Task) {
@@ -29,15 +29,15 @@ class AppRepository(
         databaseDao.deleteAllTempTasks()
     }
     fun getAllTasks(): Flow<List<ModelTask>> {
-        return databaseDao.getAllTasks()
+        return databaseDao.selectAllTasks()
     }
 
     suspend fun getAllTempTasks(): List<TempTask> {
-        return databaseDao.getAllTempTasks()
+        return databaseDao.selectAllTempTasks()
     }
 
     suspend fun copyFromTasksToTempTasks() {
-        databaseDao.copyFromTasksToTempTasks()
+        databaseDao.selectFromTasksInsertToTempTasks()
     }
 
     suspend fun deleteAllRedactingTasks() {

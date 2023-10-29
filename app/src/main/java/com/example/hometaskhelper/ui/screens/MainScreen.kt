@@ -1,5 +1,6 @@
 package com.example.hometaskhelper.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,6 +54,9 @@ fun HomeScreen(
                 tasksRemembered[task.id] = task
             }
         }
+    }
+    for (i in tasksRemembered.keys) {
+        Log.d("MainScreen", "task[$i] = ${tasksRemembered[i]}")
     }
 
     Surface(

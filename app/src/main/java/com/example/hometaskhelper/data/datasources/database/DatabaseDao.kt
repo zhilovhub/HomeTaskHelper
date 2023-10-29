@@ -15,88 +15,62 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DatabaseDao {
 
-    @Insert
-    suspend fun addUser(user: User)
-
-    @Update
-    suspend fun updateUser(user: User)
-
-    @Delete
-    suspend fun deleteUser(user: User)
-
+    // SELECT
     @Query("SELECT finished_tasks FROM ${User.TABLE_NAME} WHERE id = :id")
-    suspend fun getUserFinishedTasks(id: Int): String
-
-    @Insert
-    suspend fun addSubject(subject: Subject): Long
-
-    @Update
-    suspend fun updateSubject(subject: Subject)
-
-    @Delete
-    suspend fun deleteSubject(subject: Subject)
+    suspend fun selectUserFinishedTasks(id: Int): String
 
     @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
-    suspend fun getSubjectById(id: Int): Subject
+    suspend fun selectSubjectById(id: Int): Subject
 
     @Query("SELECT subject_name FROM ${Subject.TABLE_NAME} WHERE id = :id")
-    suspend fun getSubjectNameById(id: Int): String
+    suspend fun selectSubjectNameById(id: Int): String
 
     @Query("SELECT * FROM ${Subject.TABLE_NAME} WHERE id = :id")
-    suspend fun getSubjectByName(id: Int): Subject
-
-    @Insert
-    suspend fun addTask(task: Task)
-
-    @Update
-    suspend fun updateTask(task: Task)
-
-    @Delete
-    suspend fun deleteTask(task: Task)
+    suspend fun selectSubjectByName(id: Int): Subject
 
     @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE id = :id")
-    suspend fun getTaskById(id: Int): Task
+    suspend fun selectTaskById(id: Int): Task
 
     @Query("SELECT * FROM ${Task.TABLE_NAME} WHERE subject_id = :subjectId")
-    suspend fun getTasksOfSubject(subjectId: Int): List<Task>
+    suspend fun selectTasksOfSubject(subjectId: Int): List<Task>
 
     @Query("SELECT t1.*, t2.subject_name FROM ${Task.TABLE_NAME} as t1 " +
-           "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id")
-    fun getAllTasks(): Flow<List<ModelTask>>
-
-    @Insert
-    suspend fun addTempTask(tempTask: TempTask)
-
-    @Update
-    suspend fun updateTempTasK(tempTask: TempTask)
-
-    @Delete
-    suspend fun deleteTempTask(tempTask: TempTask)
-
-    @Query("DELETE FROM ${TempTask.TABLE_NAME}")
-    suspend fun deleteAllTempTasks()
+            "JOIN ${Subject.TABLE_NAME} as t2 ON t1.subject_id = t2.id")
+    fun selectAllTasks(): Flow<List<ModelTask>>
 
     @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
-    suspend fun getAllTempTasks(): List<TempTask>
+    suspend fun selectAllTempTasks(): List<TempTask>
 
     @Query("INSERT INTO ${TempTask.TABLE_NAME} " +
             "(id, task_id, subject_id, description, to_date, is_redacting, is_finished) " +
             "SELECT null, id, subject_id, description, to_date, is_redacting, is_finished FROM ${Task.TABLE_NAME}")
-    suspend fun copyFromTasksToTempTasks()
+    suspend fun selectFromTasksInsertToTempTasks()
 
-//    @Query("UPDATE t1 SET " +
-//            "t1.id = t2.id," +
-//            "t1.subject_id = t2.subject_id, " +
-//            "t1.description = t2.description, " +
-//            "t1.to_date = t2.to_date, " +
-//            "t1.is_redacting = t2.is_redacting, " +
-//            "t1.is_finished = t2.is_finished, " +
-//            "FROM ${Task.TABLE_NAME} as t1 " +
-//            "INNER JOIN ${TempTask.TABLE_NAME} as t2" +
-//            "ON t1.id = t2.id")
-//    suspend fun copyFromTempTaskToTasks() // TODO SELECT AND UPDATE IN ONE QUERY
-    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
-    suspend fun deleteAllRedactingTasks()
+    // INSERT
+    @Insert
+    suspend fun insertUser(user: User)
+
+    @Insert
+    suspend fun insertSubject(subject: Subject): Long
+
+    @Insert
+    suspend fun insertTask(task: Task)
+
+    @Insert
+    suspend fun insertTempTask(tempTask: TempTask)
+
+    // UPDATE
+    @Update
+    suspend fun updateUser(user: User)
+
+    @Update
+    suspend fun updateSubject(subject: Subject)
+
+    @Update
+    suspend fun updateTask(task: Task)
+
+    @Update
+    suspend fun updateTempTasK(tempTask: TempTask)
 
     @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = 0")
     suspend fun updateTasksIsRedacting()
@@ -104,9 +78,28 @@ interface DatabaseDao {
     @Query("UPDATE ${Task.TABLE_NAME} SET is_deleted = 0")
     suspend fun updateTasksIsDeleted()
 
-    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
-    suspend fun deleteDeletedTasks()
-
     @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
     suspend fun updateSubjectName(subjectId: Int, subjectName: String)
+
+    // DELETE
+    @Delete
+    suspend fun deleteUser(user: User)
+
+    @Delete
+    suspend fun deleteSubject(subject: Subject)
+
+    @Delete
+    suspend fun deleteTask(task: Task)
+
+    @Delete
+    suspend fun deleteTempTask(tempTask: TempTask)
+
+    @Query("DELETE FROM ${TempTask.TABLE_NAME}")
+    suspend fun deleteAllTempTasks()
+
+    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
+    suspend fun deleteAllRedactingTasks()
+
+    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
+    suspend fun deleteDeletedTasks()
 }

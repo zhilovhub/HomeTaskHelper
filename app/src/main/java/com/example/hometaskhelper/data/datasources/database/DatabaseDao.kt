@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
@@ -14,6 +15,53 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DatabaseDao {
+
+    // TRANSACTIONS
+    @Transaction
+    suspend fun insertSubjectInsertTask() {
+        val subjectId = insertSubject(
+            Subject(
+                id = 0,
+                "Новый",
+                "Новый"
+            )
+        )
+        insertTask(
+            Task(
+                id = 0,
+                subjectId = subjectId.toInt(),
+                description = "",
+                toDate = "",
+                isRedacting = true,
+                isFinished = false,
+                isDeleted = false
+            )
+        )
+    }
+
+    @Transaction
+    suspend fun selectAllTempTasksUpdateTaskIsDeletedDeleteAllTempTasksDeleteAllRedactingTasks() {
+        val tempTasks = selectAllTempTasks()
+        for (tempTask in tempTasks) {
+            updateTask(tempTask.toTask().copy(isRedacting = false))
+        }
+        updateTasksIsDeleted()
+        deleteAllTempTasks()
+        deleteAllRedactingTasks()
+    }
+
+    @Transaction
+    suspend fun deleteDeletedTasksUpdateTasksIsRedactingDeleteAllTempTasks() {
+        deleteDeletedTasks()
+        updateTasksIsRedacting()
+        deleteAllTempTasks()
+    }
+
+    @Transaction
+    suspend fun updateSubjectNameUpdateTask(subjectId: Int, subjectName: String, task: Task) {
+        updateSubjectName(subjectId, subjectName)
+        updateTask(task)
+    }
 
     // SELECT
     @Query("SELECT finished_tasks FROM ${User.TABLE_NAME} WHERE id = :id")

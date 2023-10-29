@@ -1,29 +1,19 @@
 package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
-import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
 import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -48,56 +38,32 @@ class MainViewModel(
     }
 
     fun tempSaveCurrentTasks() {
-        coroutineScope.launch {
-            repository.copyFromTasksToTempTasks()
-        }
+        coroutineScope.launch { repository.copyFromTasksToTempTasks() }
     }
 
     fun addNewTask() {
-        coroutineScope.launch {
-            val subjectId = repository.addNewSubject(
-                Subject(
-                    id = 0,
-                    "Новый",
-                    "Новый"
-                )
-            )
-            repository.addTask(Task(
-                id = 0,
-                subjectId = subjectId.toInt(),
-                description = "",
-                toDate = "",
-                isRedacting = true,
-                isFinished = false,
-                isDeleted = false
-            ))
-        }
+        coroutineScope.launch { repository.addNewTask() }
     }
 
     fun cancelRedacting() {
-        coroutineScope.launch {
-            val tempTasks = repository.getAllTempTasks()
-            for (tempTask in tempTasks) {
-                repository.updateTask(tempTask.toTask().copy(isRedacting = false))
-            }
-            repository.updateTasksIsDeleted()
-            repository.deleteAllTempTasks()
-            repository.deleteAllRedactingTasks()
-        }
+        coroutineScope.launch { repository.cancelRedacting() }
     }
 
     fun acceptRedacting(tasks: List<ModelTask>, changeLocalIsRedacting: (Int) -> Unit) {
         coroutineScope.launch {
-            repository.deleteDeletedTasks()
             for (task in tasks) {
                 if (task.isRedacting) {
-                    repository.updateSubjectName(task.subjectId, task.subjectName)
-                    repository.updateTask(task.toTask().copy(isRedacting = false))
-                    changeLocalIsRedacting(task.id)
+                    repository.updateSubjectNameAndTask(
+                        task.subjectId,
+                        task.subjectName,
+                        task.toTask().copy(isRedacting = false)
+                    )
+                    withContext(Dispatchers.Main) {
+                        changeLocalIsRedacting(task.id)
+                    }
                 }
             }
-            repository.updateTasksIsRedacting()
-            repository.deleteAllTempTasks()
+            repository.cleanForAcceptRedacting()
         }
     }
 
@@ -106,11 +72,7 @@ class MainViewModel(
     }
 
     fun deleteTask(task: ModelTask) {
-        coroutineScope.launch {
-            repository.updateTask(
-                task.toTask().copy(isDeleted = true)
-            )
-        }
+        coroutineScope.launch { repository.updateTask(task.toTask().copy(isDeleted = true)) }
     }
 
     fun updateUserState(newState: UserState) {
@@ -123,9 +85,7 @@ class MainViewModel(
     }
 
     fun updateTask(task: Task) {
-        coroutineScope.launch {
-            repository.updateTask(task)
-        }
+        coroutineScope.launch { repository.updateTask(task) }
     }
     
     override fun onCleared() {

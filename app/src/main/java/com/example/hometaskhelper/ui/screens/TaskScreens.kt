@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +34,7 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 @Composable
 fun Tasks(
     userState: UserState,
-    tasks: SnapshotStateMap<Int, ModelTask>,
+    tasks: SnapshotStateList<ModelTask>,
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -40,7 +42,7 @@ fun Tasks(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(tasks.values.toList()) {task ->
+        itemsIndexed(tasks) {index, task ->
             Task(
                 subjectName = task.subjectName,
                 taskDescription = task.description,
@@ -50,22 +52,22 @@ fun Tasks(
                     viewModel.updateUserState(it)
                 },
                 updateSubjectName = {
-                    if (!tasks[task.id]!!.isRedacting) {
-                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
-                    }
-                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
+//                    if (!tasks[task.id]!!.isRedacting) {
+//                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
+//                    }
+//                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
                 },
                 updateTaskDescription = {
-                    if (!tasks[task.id]!!.isRedacting) {
-                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
-                    }
-                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)
+//                    if (!tasks[task.id]!!.isRedacting) {
+//                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
+//                    }
+//                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)
                 },
                 updateTaskIsFinished = {
-                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
+//                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(tasks[task.id]!!)
+//                    viewModel.deleteTask(tasks[task.id]!!)
                 }
             )
         }
@@ -98,7 +100,7 @@ fun Task(
                 BasicTextField(
                     value = subjectName,
                     onValueChange = {
-                        updateSubjectName(it)
+//                        updateSubjectName(it)
                         updateUserState(UserState.REDACTING)
                     },
                     textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
@@ -110,7 +112,7 @@ fun Task(
                             value = taskDescription,
                             enabled = !taskIsFinished,
                             onValueChange = {
-                                updateTaskDescription(it)
+//                                updateTaskDescription(it)
                                 updateUserState(UserState.REDACTING)
                             }
                         )

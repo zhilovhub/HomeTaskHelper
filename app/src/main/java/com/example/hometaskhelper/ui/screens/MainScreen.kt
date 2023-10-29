@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
@@ -35,29 +36,33 @@ fun HomeScreen(
     viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(LocalContext.current.applicationContext))
 ) {
     val tasksState by viewModel.tasksState.collectAsState()
+    val subjectsState by viewModel.subjectsState.collectAsState()
     val userState by viewModel.userState.collectAsState()
 
-    val tasksRemembered = remember { mutableStateMapOf(
-        *tasksState.map { it.id to it }.toTypedArray()
+    val tasksRemembered = remember {
+        mutableStateListOf(*tasksState.toTypedArray()
     ) }
+    val subjectsRemembered = remember {
+        mutableStateMapOf(*subjectsState.map { it.id to it }.toTypedArray())
+    }
 
-    if (tasksState.map { it.id to it } != tasksRemembered) {
-        for (taskId in tasksRemembered.keys.minus(tasksState.map { it.id }.toSet())) {  // Deleting task
-            tasksRemembered.remove(taskId)
-        }
-        for (task in tasksState) {
-            if (task.isDeleted && tasksRemembered.keys.contains(task.id)) {  // Deleting task
-                tasksRemembered.remove(task.id)
-            } else if (!task.isDeleted && !tasksRemembered.keys.contains(task.id)) {  // Adding task
-                tasksRemembered[task.id] = task
-            } else if (tasksRemembered[task.id] != task && tasksRemembered[task.id]?.isRedacting == false) {  // Replacing not redacting tasks
-                tasksRemembered[task.id] = task
-            }
-        }
-    }
-    for (i in tasksRemembered.keys) {
-        Log.d("MainScreen", "task[$i] = ${tasksRemembered[i]}")
-    }
+//    if (tasksState.map { it.id to it } != tasksRemembered) {
+//        for (taskId in tasksRemembered.keys.minus(tasksState.map { it.id }.toSet())) {  // Deleting task
+//            tasksRemembered.remove(taskId)
+//        }
+//        for (task in tasksState) {
+//            if (task.isDeleted && tasksRemembered.keys.contains(task.id)) {  // Deleting task
+//                tasksRemembered.remove(task.id)
+//            } else if (!task.isDeleted && !tasksRemembered.keys.contains(task.id)) {  // Adding task
+//                tasksRemembered[task.id] = task
+//            } else if (tasksRemembered[task.id] != task && tasksRemembered[task.id]?.isRedacting == false) {  // Replacing not redacting tasks
+//                tasksRemembered[task.id] = task
+//            }
+//        }
+//    }
+//    for (i in tasksRemembered.keys) {
+//        Log.d("MainScreen", "task[$i] = ${tasksRemembered[i]}")
+//    }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -95,15 +100,15 @@ fun HomeScreen(
                         viewModel.updateUserState(it)
                     },
                     onAcceptRedacting = {
-                        viewModel.acceptRedacting(tasksRemembered.values.toMutableStateList()) {it: Int ->
-                            tasksRemembered[it] = tasksRemembered[it]!!.copy(isRedacting = false)
-                        }
+//                        viewModel.acceptRedacting(tasksRemembered.values.toMutableStateList()) {it: Int ->
+//                            tasksRemembered[it] = tasksRemembered[it]!!.copy(isRedacting = false)
+//                        }
                     },
                     onCancelRedacting = {
-                        for (taskId in tasksRemembered.keys) {
-                            tasksRemembered[taskId] = tasksRemembered[taskId]!!.copy(isRedacting = false)
-                        }
-                        viewModel.cancelRedacting()
+//                        for (taskId in tasksRemembered.keys) {
+//                            tasksRemembered[taskId] = tasksRemembered[taskId]!!.copy(isRedacting = false)
+//                        }
+//                        viewModel.cancelRedacting()
                     },
                     modifier = Modifier.align(Alignment.TopEnd)
                 )

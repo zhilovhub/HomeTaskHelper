@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
+import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +26,9 @@ class MainViewModel(
 
     private val _tasksState = MutableStateFlow(emptyList<ModelTask>())
     val tasksState: StateFlow<List<ModelTask>> = _tasksState.asStateFlow()
+
+    private val _subjectsState = MutableStateFlow(emptyList<ModelSubject>())
+    val subjectsState: StateFlow<List<ModelSubject>> = _subjectsState.asStateFlow()
 
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()

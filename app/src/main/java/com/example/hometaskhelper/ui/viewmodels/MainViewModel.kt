@@ -35,13 +35,11 @@ class MainViewModel(
     init {
         coroutineScope.launch {
             repository.getAllTasks().collect { newTasks ->
-                println(newTasks.toString())
                 _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = newTasks) }
             }
         }
         coroutineScope.launch {
             repository.getAllSubjects().collect {newSubjects ->
-                println(newSubjects.toString())
                 _tasksState.update { tasksUiState -> tasksUiState.copy(subjects = mapOf(*newSubjects.map { it.id to it }.toTypedArray())) }
             }
         }
@@ -106,7 +104,7 @@ class MainViewModel(
 
     fun deleteTask(task: ModelTask) {
         val newTasks = _tasksState.value.tasks.toMutableList()
-        val index = newTasks.indexOf(task)
+        val index = newTasks.indexOfFirst { it.id == task.id }
         newTasks[index] = task.copy(isDeleted = true)
         _tasksState.update {
             _tasksState.value.copy(tasks = newTasks)
@@ -119,6 +117,17 @@ class MainViewModel(
             if (_userState.value != UserState.DEFAULT) {
                 tempSaveCurrentTasks()
             }
+        }
+    }
+
+    fun updateTaskDescription(task: ModelTask, description: String) {
+        val newTasks = _tasksState.value.tasks.toMutableList()
+        val index = newTasks.indexOfFirst { it.id == task.id }
+        newTasks[index] = task.copy(description = description)
+        _tasksState.update {
+            _tasksState.value.copy(
+                tasks = newTasks.toList()
+            )
         }
     }
 

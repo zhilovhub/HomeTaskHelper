@@ -58,13 +58,14 @@ fun Tasks(
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
 //                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
-                                    viewModel.updateSubjectName(tasks[index].subjectId, it)
+                    viewModel.updateSubjectName(tasks[index].subjectId, it)
                 },
                 updateTaskDescription = {
 //                    if (!tasks[task.id]!!.isRedacting) {
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
 //                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)
+                    viewModel.updateTaskDescription(tasks[index], it)
                 },
                 updateTaskIsFinished = {
 //                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
@@ -103,8 +104,8 @@ fun Task(
                 BasicTextField(
                     value = subjectName,
                     onValueChange = {
-                        updateSubjectName(it)
                         updateUserState(UserState.REDACTING)
+                        updateSubjectName(it)
                     },
                     textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                     singleLine = true
@@ -115,8 +116,8 @@ fun Task(
                             value = taskDescription,
                             enabled = !taskIsFinished,
                             onValueChange = {
-//                                updateTaskDescription(it)
                                 updateUserState(UserState.REDACTING)
+                                updateTaskDescription(it)
                             }
                         )
                         if (userState == UserState.DELETING) {

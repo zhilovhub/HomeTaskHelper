@@ -160,7 +160,6 @@ class MainViewModel(
     
     override fun onCleared() {
         super.onCleared()
-        cancelRedacting()
         coroutineScope.cancel()
     }
 

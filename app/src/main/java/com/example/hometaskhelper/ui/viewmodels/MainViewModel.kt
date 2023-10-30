@@ -52,9 +52,13 @@ class MainViewModel(
     }
 
     fun addNewTask() {
+        var taskId = -1
         var subjectId = -1
         while (_tasksState.value.subjects.containsKey(subjectId)) {
             subjectId--;
+        }
+        while (_tasksState.value.tasks.map { it.id }.contains(taskId)) {
+            taskId--;
         }
         val newSubject = ModelSubject(
             id = subjectId,
@@ -62,7 +66,7 @@ class MainViewModel(
             aliases = ""
         )
         val newTask = ModelTask(
-            id = 0,
+            id = taskId,
             subjectId = subjectId,
             description = "",
             toDate = "",
@@ -101,7 +105,12 @@ class MainViewModel(
     }
 
     fun deleteTask(task: ModelTask) {
-        coroutineScope.launch { repository.updateTask(task.toTask().copy(isDeleted = true)) }
+        val newTasks = _tasksState.value.tasks.toMutableList()
+        val index = newTasks.indexOf(task)
+        newTasks[index] = task.copy(isDeleted = true)
+        _tasksState.update {
+            _tasksState.value.copy(tasks = newTasks)
+        }
     }
 
     fun updateUserState(newState: UserState) {

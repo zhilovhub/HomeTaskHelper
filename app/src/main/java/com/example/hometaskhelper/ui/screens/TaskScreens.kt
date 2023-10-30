@@ -44,7 +44,7 @@ fun Tasks(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(tasks) {index, task ->
+        itemsIndexed(tasks.filter { !it.isDeleted }) {index, task ->
             Task(
                 subjectName = subjects[task.subjectId]?.subjectName ?: "",
                 taskDescription = task.description,
@@ -69,7 +69,7 @@ fun Tasks(
 //                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
                 },
                 deleteTask = {
-//                    viewModel.deleteTask(tasks[task.id]!!)
+                    viewModel.deleteTask(tasks[index])
                 }
             )
         }

@@ -39,7 +39,9 @@ fun HomeScreen(
     val tasksState by viewModel.tasksState.collectAsState()
     val userState by viewModel.userState.collectAsState()
 
-    println(tasksState.tasks)
+    Log.d("HomeScreen", tasksState.tasks.toList().toString())
+    Log.d("HomeScreen", tasksState.subjects.toList().toString())
+    Log.d("HomeScreen", "${userState.name}\n\n")
 
 //    if (tasksState.map { it.id to it } != tasksRemembered) {
 //        for (taskId in tasksRemembered.keys.minus(tasksState.map { it.id }.toSet())) {  // Deleting task
@@ -88,7 +90,7 @@ fun HomeScreen(
                 RedactTasks(
                     userState = userState,
                     onUpdateUserState = {
-                        viewModel.updateUserState(userState)
+                        viewModel.updateUserState(it)
                     },
                     onAddTask = {
                         viewModel.addNewTask()

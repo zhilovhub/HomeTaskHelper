@@ -143,6 +143,17 @@ class MainViewModel(
         }
     }
 
+    fun updateTaskIsFinished(task: ModelTask, isFinished: Boolean) {
+        val newTasks = _tasksState.value.tasks.toMutableList()
+        val index = newTasks.indexOfFirst { it.id == task.id }
+        newTasks[index] = task.copy(isFinished = isFinished)
+        _tasksState.update {
+            _tasksState.value.copy(
+                tasks = newTasks.toList()
+            )
+        }
+    }
+
     fun updateTask(task: Task) {
         coroutineScope.launch { repository.updateTask(task) }
     }

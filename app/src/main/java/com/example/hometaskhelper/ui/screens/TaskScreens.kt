@@ -68,7 +68,7 @@ fun Tasks(
                     viewModel.updateTaskDescription(tasks[index], it)
                 },
                 updateTaskIsFinished = {
-//                    tasks[task.id] = tasks[task.id]!!.copy(isFinished = it)
+                    viewModel.updateTaskIsFinished(tasks[index], it)
                 },
                 deleteTask = {
                     viewModel.deleteTask(tasks[index])

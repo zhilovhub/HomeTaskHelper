@@ -58,6 +58,7 @@ fun Tasks(
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
 //                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
+                                    viewModel.updateSubjectName(tasks[index].subjectId, it)
                 },
                 updateTaskDescription = {
 //                    if (!tasks[task.id]!!.isRedacting) {
@@ -102,7 +103,7 @@ fun Task(
                 BasicTextField(
                     value = subjectName,
                     onValueChange = {
-//                        updateSubjectName(it)
+                        updateSubjectName(it)
                         updateUserState(UserState.REDACTING)
                     },
                     textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),

@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 
 data class ModelSubject(
-    @ColumnInfo(name = "id") val id: Int,
-    @ColumnInfo(name = "subject_name") val subjectName: String,
-    @ColumnInfo(name = "aliases") val aliases: String
+    @ColumnInfo(name = "id") val id: Int = -1000,
+    @ColumnInfo(name = "subject_name") val subjectName: String = "",
+    @ColumnInfo(name = "aliases") val aliases: String = ""
 ) {
     fun toSubject(): Subject {
         return Subject(

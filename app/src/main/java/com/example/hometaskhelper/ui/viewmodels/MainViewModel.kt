@@ -122,6 +122,18 @@ class MainViewModel(
         }
     }
 
+    fun updateSubjectName(subjectId: Int, subjectName: String) {
+        val newSubjects = _tasksState.value.subjects.toMutableMap()
+        if (newSubjects.containsKey(subjectId)) {
+            newSubjects[subjectId] = newSubjects[subjectId]?.copy(subjectName = subjectName) ?: ModelSubject()
+        }
+        _tasksState.update {
+            _tasksState.value.copy(
+                subjects = newSubjects.toMap()
+            )
+        }
+    }
+
     fun updateTask(task: Task) {
         coroutineScope.launch { repository.updateTask(task) }
     }

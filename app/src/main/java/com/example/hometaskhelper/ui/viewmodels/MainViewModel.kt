@@ -52,7 +52,30 @@ class MainViewModel(
     }
 
     fun addNewTask() {
-        coroutineScope.launch { repository.addNewTask() }
+        var subjectId = -1
+        while (_tasksState.value.subjects.containsKey(subjectId)) {
+            subjectId--;
+        }
+        val newSubject = ModelSubject(
+            id = subjectId,
+            subjectName = "Новый",
+            aliases = ""
+        )
+        val newTask = ModelTask(
+            id = 0,
+            subjectId = subjectId,
+            description = "",
+            toDate = "",
+            isRedacting = true,
+            isFinished = false,
+            isDeleted = false
+        )
+        _tasksState.update {
+            _tasksState.value.copy(
+                tasks = (_tasksState.value.tasks.toMutableList() + newTask).toList(),
+                subjects = (_tasksState.value.subjects.toMutableMap().plus(subjectId to newSubject)).toMap()
+            )
+        }
     }
 
     fun cancelRedacting() {

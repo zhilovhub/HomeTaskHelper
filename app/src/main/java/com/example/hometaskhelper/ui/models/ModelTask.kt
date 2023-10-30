@@ -29,7 +29,7 @@ data class ModelTask(
     fun toTempTask(): TempTask {
         return TempTask(
             id = 0,
-            taskId = 0,
+            taskId = id,
             subjectId = subjectId,
             subjectName = "",
             description = description,

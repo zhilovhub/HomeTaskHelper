@@ -29,6 +29,9 @@ class MainViewModel(
     private val _tasksState = MutableStateFlow(TasksUiState(tasks = listOf(), subjects = mapOf()))
     val tasksState: StateFlow<TasksUiState> = _tasksState.asStateFlow()
 
+    private var tempTasks = listOf<ModelTask>()
+    private var tempSubjects = mapOf<Int, ModelSubject>()
+
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
@@ -46,7 +49,8 @@ class MainViewModel(
     }
 
     private fun tempSaveCurrentTasks() {
-        coroutineScope.launch { repository.insertToTempTasks(_tasksState.value.tasks.map { it.toTempTask() }) }
+        tempTasks = _tasksState.value.tasks.toList()
+        tempSubjects = _tasksState.value.subjects.toMap()
     }
 
     fun addNewTask() {
@@ -81,7 +85,8 @@ class MainViewModel(
     }
 
     fun cancelRedacting() {
-        coroutineScope.launch { repository.cancelRedacting() }
+        _tasksState.update { _tasksState.value.copy(tasks = tempTasks, subjects = tempSubjects) }
+//        coroutineScope.launch { repository.cancelRedacting() }  TODO send isRedacting = False to DB
     }
 
     fun acceptRedacting(tasks: List<ModelTask>, changeLocalIsRedacting: (Int) -> Unit) {

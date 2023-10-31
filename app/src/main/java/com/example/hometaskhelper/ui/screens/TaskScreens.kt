@@ -57,21 +57,21 @@ fun Tasks(
 //                    if (!tasks[task.id]!!.isRedacting) {
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
-//                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)
+//                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)  // TODO update task's isRedacting
                     viewModel.updateSubjectName(tasks[index].subjectId, it)
                 },
                 updateTaskDescription = {
 //                    if (!tasks[task.id]!!.isRedacting) {
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
-//                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)
+//                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)  // TODO update task's isRedacting
                     viewModel.updateTaskDescription(tasks[index], it)
                 },
                 updateTaskIsFinished = {
                     viewModel.updateTaskIsFinished(tasks[index], it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(tasks[index])
+                    viewModel.deleteTask(tasks[index])  // TODO update task's isRedacting
                 }
             )
         }

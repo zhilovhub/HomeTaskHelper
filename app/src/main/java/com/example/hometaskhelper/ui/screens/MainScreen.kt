@@ -127,10 +127,7 @@ fun HomeScreen(
 //                        }
                     },
                     onCancelRedacting = {
-//                        for (taskId in tasksRemembered.keys) {
-//                            tasksRemembered[taskId] = tasksRemembered[taskId]!!.copy(isRedacting = false)
-//                        }
-//                        viewModel.cancelRedacting()
+                        viewModel.cancelRedacting()
                     },
                     modifier = Modifier.align(Alignment.TopEnd)
                 )

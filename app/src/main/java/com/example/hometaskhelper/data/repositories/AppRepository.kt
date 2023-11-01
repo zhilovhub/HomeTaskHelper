@@ -1,6 +1,7 @@
 package com.example.hometaskhelper.data.repositories
 
 import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
+import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.network.SQLApi
@@ -14,20 +15,8 @@ class AppRepository(
     private val sqlApi: SQLApi
 ) {
     // Local
-    suspend fun addNewTask() {
-        databaseDao.insertSubjectInsertTask()
-    }
-
-    suspend fun cancelRedacting() {
-        databaseDao.selectAllTempTasksUpdateTaskIsDeletedDeleteAllTempTasksDeleteAllRedactingTasks()
-    }
-
-    suspend fun cleanForAcceptRedacting() {
-        databaseDao.deleteDeletedTasksUpdateTasksIsRedactingDeleteAllTempTasks()
-    }
-
-    suspend fun updateSubjectNameAndTask(subjectId: Int, subjectName: String, task: Task) {
-        databaseDao.updateSubjectNameUpdateTask(subjectId, subjectName, task)
+    suspend fun insertSubjectsAndTasks(subjects: List<Subject>, tasks: List<Task>) {
+        databaseDao.transactionInsertSubjectsInsertTasks(subjects, tasks)
     }
 
     fun getAllTasks(): Flow<List<ModelTask>> {
@@ -40,14 +29,6 @@ class AppRepository(
 
     suspend fun updateTask(task: Task) {
         databaseDao.updateTask(task)
-    }
-
-    suspend fun updateSubjectName(subjectId: Int, subjectName: String) {
-        databaseDao.updateSubjectName(subjectId, subjectName)
-    }
-
-    suspend fun insertToTempTasks(tasks: List<TempTask>) {
-        databaseDao.insertToTempTasks(tasks)
     }
 
     // Network

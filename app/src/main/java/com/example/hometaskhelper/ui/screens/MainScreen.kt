@@ -47,7 +47,7 @@ fun HomeScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP || event == Lifecycle.Event.ON_START) {
-                viewModel.cancelRedacting()
+                viewModel.resetIsRedactingTasks()
             }
         }
 
@@ -58,8 +58,10 @@ fun HomeScreen(
         }
     }
 
-    Log.d("HomeScreen", tasksState.tasks.toList().toString())
-    Log.d("HomeScreen", tasksState.subjects.toList().toString())
+    Log.d("HomeScreen", "TASKS:")
+    for (task in tasksState.tasks.toList()) {
+        Log.d("HomeScreen", task.toString())
+    }
     Log.d("HomeScreen", "${userState.name}\n\n")
 
 //    if (tasksState.map { it.id to it } != tasksRemembered) {
@@ -122,9 +124,7 @@ fun HomeScreen(
                         viewModel.updateUserState(it)
                     },
                     onAcceptRedacting = {
-//                        viewModel.acceptRedacting(tasksRemembered.values.toMutableStateList()) {it: Int ->
-//                            tasksRemembered[it] = tasksRemembered[it]!!.copy(isRedacting = false)
-//                        }
+                        viewModel.acceptRedacting()
                     },
                     onCancelRedacting = {
                         viewModel.cancelRedacting()

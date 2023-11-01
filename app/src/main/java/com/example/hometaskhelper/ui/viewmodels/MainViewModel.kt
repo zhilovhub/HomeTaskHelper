@@ -86,24 +86,23 @@ class MainViewModel(
 
     fun cancelRedacting() {
         _tasksState.update { _tasksState.value.copy(tasks = tempTasks, subjects = tempSubjects) }
+        resetIsRedactingTasks()
+    }
+
+    fun resetIsRedactingTasks() {
 //        coroutineScope.launch { repository.cancelRedacting() }  TODO send isRedacting = False to DB
     }
 
-    fun acceptRedacting(tasks: List<ModelTask>, changeLocalIsRedacting: (Int) -> Unit) {
+    fun acceptRedacting() {
+        val getTask = {task: Task ->
+            if (task.id < 0) task.copy(id = 0)
+            else task
+        }
         coroutineScope.launch {
-            for (task in tasks) {
-                if (task.isRedacting) {
-                    repository.updateSubjectNameAndTask(
-                        task.subjectId,
-                        _tasksState.value.subjects[task.subjectId]?.subjectName ?: "",
-                        task.toTask().copy(isRedacting = false)
-                    )
-                    withContext(Dispatchers.Main) {
-                        changeLocalIsRedacting(task.id)
-                    }
-                }
-            }
-            repository.cleanForAcceptRedacting()
+            repository.insertSubjectsAndTasks(
+                subjects = _tasksState.value.subjects.map { it.value.toSubject() },
+                tasks = _tasksState.value.tasks.map { getTask(it.toTask()) }
+            )
         }
     }
 

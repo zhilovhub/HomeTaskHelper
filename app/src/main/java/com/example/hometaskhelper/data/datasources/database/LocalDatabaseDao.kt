@@ -3,6 +3,7 @@ package com.example.hometaskhelper.data.datasources.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -19,25 +20,14 @@ interface LocalDatabaseDao {
 
     // TRANSACTIONS
     @Transaction
-    suspend fun insertSubjectInsertTask() {
-        val subjectId = insertSubject(
-            Subject(
-                id = 0,
-                "Новый",
-                "Новый"
-            )
-        )
-        insertTask(
-            Task(
-                id = 0,
-                subjectId = subjectId.toInt(),
-                description = "",
-                toDate = "",
-                isRedacting = true,
-                isFinished = false,
-                isDeleted = false
-            )
-        )
+    suspend fun transactionInsertSubjectsInsertTasks(subjects: List<Subject>, tasks: List<Task>) {
+        val cache = mutableMapOf<Int, Int>()
+        var newId: Long
+        for (subject in subjects) {
+            newId = insertSubject(subject.copy(id = 0))
+            cache[subject.id] = newId.toInt()
+        }
+        insertTasks(tasks.map { it.copy(subjectId = cache[it.subjectId] ?: 1) })
     }
 
     @Transaction
@@ -99,11 +89,11 @@ interface LocalDatabaseDao {
     @Insert
     suspend fun insertUser(user: User)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSubject(subject: Subject): Long
 
-    @Insert
-    suspend fun insertTask(task: Task)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTasks(tasks: List<Task>)
 
     @Insert
     suspend fun insertTempTask(tempTask: TempTask)

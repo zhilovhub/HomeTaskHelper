@@ -3,7 +3,6 @@ package com.example.hometaskhelper.data.repositories
 import com.example.hometaskhelper.data.datasources.database.LocalDatabaseDao
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.network.SQLApi
 import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask

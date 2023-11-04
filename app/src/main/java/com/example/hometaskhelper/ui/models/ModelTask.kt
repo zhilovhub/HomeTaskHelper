@@ -2,7 +2,6 @@ package com.example.hometaskhelper.ui.models
 
 import androidx.room.ColumnInfo
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 
 
 data class ModelTask(
@@ -23,19 +22,6 @@ data class ModelTask(
             isRedacting = isRedacting,
             isFinished = isFinished,
             isDeleted = false
-        )
-    }
-
-    fun toTempTask(): TempTask {
-        return TempTask(
-            id = 0,
-            taskId = id,
-            subjectId = subjectId,
-            subjectName = "",
-            description = description,
-            toDate = toDate,
-            isRedacting = isRedacting,
-            isFinished = isFinished,
         )
     }
 }

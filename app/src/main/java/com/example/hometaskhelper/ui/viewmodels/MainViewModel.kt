@@ -106,9 +106,6 @@ class MainViewModel(
                 tasks = tasks.map { getTask(it.toTask()) }
             )
             repository.deleteTasks(tasks.filter { it.isDeleted }.map { it.toTask() })
-            _tasksState.update {
-                _tasksState.value.copy(tasks = tasks.filter { !it.isDeleted })
-            }
         }
     }
 

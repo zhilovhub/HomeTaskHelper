@@ -9,7 +9,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
-import com.example.hometaskhelper.data.datasources.database.entities.TempTask
 import com.example.hometaskhelper.data.datasources.database.entities.User
 import com.example.hometaskhelper.ui.models.ModelSubject
 import com.example.hometaskhelper.ui.models.ModelTask
@@ -63,12 +62,6 @@ interface LocalDatabaseDao {
     @Query("SELECT * FROM ${Subject.TABLE_NAME}")
     fun selectAllSubjects(): Flow<List<ModelSubject>>
 
-    @Query("SELECT * FROM ${TempTask.TABLE_NAME}")
-    suspend fun selectAllTempTasks(): List<TempTask>
-
-    @Insert
-    suspend fun insertToTempTasks(tasks: List<TempTask>)
-
     // INSERT
     @Insert
     suspend fun insertUser(user: User)
@@ -78,9 +71,6 @@ interface LocalDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasks(tasks: List<Task>)
-
-    @Insert
-    suspend fun insertTempTask(tempTask: TempTask)
 
     // UPDATE
     @Update
@@ -92,9 +82,6 @@ interface LocalDatabaseDao {
     @Update
     suspend fun updateTask(task: Task)
 
-    @Update
-    suspend fun updateTempTasK(tempTask: TempTask)
-
     @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = 0")
     suspend fun updateTasksIsRedacting()
 
@@ -104,9 +91,6 @@ interface LocalDatabaseDao {
     // DELETE
     @Delete
     suspend fun deleteTasks(tasks: List<Task>)
-
-    @Query("DELETE FROM ${TempTask.TABLE_NAME}")
-    suspend fun deleteAllTempTasks()
 
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
     suspend fun deleteAllRedactingTasks()

@@ -15,10 +15,6 @@ class AppRepository(
     private val sqlApi: SQLApi
 ) {
     // Local
-    suspend fun insertSubjectsAndTasks(subjects: List<Subject>, tasks: List<Task>) {
-        databaseDao.transactionInsertSubjectsInsertTasks(subjects, tasks)
-    }
-
     fun getAllTasks(): Flow<List<ModelTask>> {
         return databaseDao.selectAllTasks()
     }
@@ -27,8 +23,16 @@ class AppRepository(
         return databaseDao.selectAllSubjects()
     }
 
+    suspend fun insertSubjectsAndTasks(subjects: List<Subject>, tasks: List<Task>) {
+        databaseDao.transactionInsertSubjectsInsertTasks(subjects, tasks)
+    }
+
     suspend fun updateTask(task: Task) {
         databaseDao.updateTask(task)
+    }
+
+    suspend fun deleteTasks(tasks: List<Task>) {
+        databaseDao.deleteTasks(tasks)
     }
 
     // Network

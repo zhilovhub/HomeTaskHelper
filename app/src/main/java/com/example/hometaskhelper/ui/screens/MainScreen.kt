@@ -64,24 +64,6 @@ fun HomeScreen(
     }
     Log.d("HomeScreen", "${userState.name}\n\n")
 
-//    if (tasksState.map { it.id to it } != tasksRemembered) {
-//        for (taskId in tasksRemembered.keys.minus(tasksState.map { it.id }.toSet())) {  // Deleting task
-//            tasksRemembered.remove(taskId)
-//        }
-//        for (task in tasksState) {
-//            if (task.isDeleted && tasksRemembered.keys.contains(task.id)) {  // Deleting task
-//                tasksRemembered.remove(task.id)
-//            } else if (!task.isDeleted && !tasksRemembered.keys.contains(task.id)) {  // Adding task
-//                tasksRemembered[task.id] = task
-//            } else if (tasksRemembered[task.id] != task && tasksRemembered[task.id]?.isRedacting == false) {  // Replacing not redacting tasks
-//                tasksRemembered[task.id] = task
-//            }
-//        }
-//    }
-//    for (i in tasksRemembered.keys) {
-//        Log.d("MainScreen", "task[$i] = ${tasksRemembered[i]}")
-//    }
-
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background

@@ -24,28 +24,12 @@ interface LocalDatabaseDao {
         val cache = mutableMapOf<Int, Int>()
         var newId: Long
         for (subject in subjects) {
-            newId = insertSubject(subject.copy(id = 0))
-            cache[subject.id] = newId.toInt()
+            newId = insertSubject(if (subject.id < 0) subject.copy(id = 0) else subject)
+            if (subject.id < 0) {
+                cache[subject.id] = newId.toInt()
+            }
         }
-        insertTasks(tasks.map { it.copy(subjectId = cache[it.subjectId] ?: 1) })
-    }
-
-    @Transaction
-    suspend fun selectAllTempTasksUpdateTaskIsDeletedDeleteAllTempTasksDeleteAllRedactingTasks() {
-        val tempTasks = selectAllTempTasks()
-        for (tempTask in tempTasks) {
-            updateTask(tempTask.toTask().copy(isRedacting = false))
-        }
-        updateTasksIsDeleted()
-        deleteAllTempTasks()
-        deleteAllRedactingTasks()
-    }
-
-    @Transaction
-    suspend fun deleteDeletedTasksUpdateTasksIsRedactingDeleteAllTempTasks() {
-        deleteDeletedTasks()
-        updateTasksIsRedacting()
-        deleteAllTempTasks()
+        insertTasks(tasks.map { it.copy(subjectId = cache[it.subjectId] ?: it.subjectId) })
     }
 
     @Transaction
@@ -114,31 +98,16 @@ interface LocalDatabaseDao {
     @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = 0")
     suspend fun updateTasksIsRedacting()
 
-    @Query("UPDATE ${Task.TABLE_NAME} SET is_deleted = 0")
-    suspend fun updateTasksIsDeleted()
-
     @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
     suspend fun updateSubjectName(subjectId: Int, subjectName: String)
 
     // DELETE
     @Delete
-    suspend fun deleteUser(user: User)
-
-    @Delete
-    suspend fun deleteSubject(subject: Subject)
-
-    @Delete
-    suspend fun deleteTask(task: Task)
-
-    @Delete
-    suspend fun deleteTempTask(tempTask: TempTask)
+    suspend fun deleteTasks(tasks: List<Task>)
 
     @Query("DELETE FROM ${TempTask.TABLE_NAME}")
     suspend fun deleteAllTempTasks()
 
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
     suspend fun deleteAllRedactingTasks()
-
-    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1")
-    suspend fun deleteDeletedTasks()
 }

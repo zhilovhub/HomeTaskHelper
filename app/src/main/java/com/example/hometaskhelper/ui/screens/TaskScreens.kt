@@ -44,7 +44,7 @@ fun Tasks(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(tasks.filter { !it.isDeleted }) {index, task ->
+        items(tasks.filter { !it.isDeleted }) {task ->
             Task(
                 subjectName = subjects[task.subjectId]?.subjectName ?: "",
                 taskDescription = task.description,
@@ -58,20 +58,20 @@ fun Tasks(
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
 //                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)  // TODO update task's isRedacting
-                    viewModel.updateSubjectName(tasks[index].subjectId, it)
+                    viewModel.updateSubjectName(task.subjectId, it)
                 },
                 updateTaskDescription = {
 //                    if (!tasks[task.id]!!.isRedacting) {
 //                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
 //                    }
 //                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)  // TODO update task's isRedacting
-                    viewModel.updateTaskDescription(tasks[index], it)
+                    viewModel.updateTaskDescription(task, it)
                 },
                 updateTaskIsFinished = {
-                    viewModel.updateTaskIsFinished(tasks[index], it)
+                    viewModel.updateTaskIsFinished(task, it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(tasks[index])  // TODO update task's isRedacting
+                    viewModel.deleteTask(task)  // TODO update task's isRedacting
                 }
             )
         }

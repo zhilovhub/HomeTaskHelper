@@ -37,7 +37,7 @@ class MainViewModel(
 
     init {
         coroutineScope.launch {
-            repository.getAllTasks().collect { newTasks ->
+            repository.getAllTasks().collect { newTasks ->  // TODO if userState != Default - dont't do it. Work with tempTasks and this
                 _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = newTasks) }
             }
         }
@@ -98,11 +98,17 @@ class MainViewModel(
             if (task.id < 0) task.copy(id = 0)
             else task
         }
+        val tasks = _tasksState.value.tasks
+
         coroutineScope.launch {
             repository.insertSubjectsAndTasks(
                 subjects = _tasksState.value.subjects.map { it.value.toSubject() },
-                tasks = _tasksState.value.tasks.map { getTask(it.toTask()) }
+                tasks = tasks.map { getTask(it.toTask()) }
             )
+            repository.deleteTasks(tasks.filter { it.isDeleted }.map { it.toTask() })
+            _tasksState.update {
+                _tasksState.value.copy(tasks = tasks.filter { !it.isDeleted })
+            }
         }
     }
 

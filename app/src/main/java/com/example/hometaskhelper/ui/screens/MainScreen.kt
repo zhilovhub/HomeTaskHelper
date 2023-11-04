@@ -1,13 +1,19 @@
 package com.example.hometaskhelper.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,12 +21,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hometaskhelper.R
 import com.example.hometaskhelper.ui.models.Task
 import com.example.hometaskhelper.ui.theme.HomeTaskHelperTheme
 
@@ -33,7 +41,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(top = 48.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -45,54 +52,116 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center
             )
             Tasks()
+            RedactTasks()
         }
+        AcceptCancel()
     }
 }
 
 
 @Composable
-fun Tasks(tasks: List<Task> = listOf(
+fun Tasks(modifier: Modifier = Modifier, tasks: List<Task> = listOf(
     Task("Матан", "21.09.23\n1-4 номера без букв А"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
-    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
+//    Task("Линал",  "22.09.23\n1-8 номера без букв Б"),
     Task("История",  "\nЭссе"),
 )) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 48.dp, start = 48.dp, end = 48.dp, bottom = 96.dp)
-//        color = MaterialTheme.colorScheme.error
+    LazyColumn(
+        modifier = modifier.height(470.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        items(tasks) {task ->
+            Task(task = task)
+        }
+    }
+}
+
+
+@Composable
+fun RedactTasks(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+    ) {
+
+        Button(
+            modifier = Modifier,
+            onClick = { }
         ) {
-            items(tasks) {task ->
-                Task(task)
-            }
+            Text("Добавить")
+        }
+        Button(
+            modifier = Modifier,
+            onClick = { }
+        ) {
+            Text("Удалить")
+        }
+    }
+}
+
+
+@Composable
+fun AcceptCancel(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+    ) {
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_check_circle_24),
+                contentDescription = null
+            )
+        }
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_cancel_24),
+                contentDescription = null
+            )
         }
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-//@Preview
 @Composable
-fun Task(task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
-    Column {
-        Text(text = task.name)
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = task.description,
-            onValueChange = {  },
-            label = {Text("Description")}
-        )
+fun Task(modifier: Modifier = Modifier, task: Task = Task("Линал", "22.09.23\n1-8 номера без букв Б")) {
+    Surface(
+        modifier = modifier
+    ) {
+        Column {
+            Text(text = task.name)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                TextField(
+                    value = task.description,
+                    onValueChange = { },
+                    label = { Text("Description") }
+                )
+                Checkbox(
+                    checked = false,
+                    onCheckedChange = {  }
+                )
+            }
+        }
+        IconButton(
+            onClick = {  }
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = null
+            )
+        }
     }
 }
 

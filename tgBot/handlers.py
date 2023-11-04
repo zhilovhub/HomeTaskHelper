@@ -53,7 +53,6 @@ class AddAlias(StatesGroup):
 async def start(message: types.Message, state: FSMContext):
     await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register")
 
-
 @r.message(Command("help"))
 async def help(message: types.Message, state: FSMContext):
     await message.answer("""
@@ -76,8 +75,11 @@ async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Текущее действие отменено🗑️")
     return
+#------------------END------------------
 
 
+  
+  
 #------------------REGISTATION------------------
 @r.message(Command("register"))
 async def registerNewUser(message: types.Message, state: FSMContext):
@@ -263,8 +265,6 @@ async def MarkAsComplete(data: types.CallbackQuery, state: FSMContext):
     db.markAsComplete(taskID, db.getUserNameByTGID(data.from_user.id))
     await data.message.delete()
     await data.message.answer("Молодец, задание вычеркнуто из списка дел✍️")
-
-
 #------------------END------------------
 
 
@@ -325,7 +325,7 @@ async def delSubject(data:types.CallbackQuery):
 async def startAddAlias(message: types.Message, state: FSMContext):
     await message.answer("Отправь мне название предмета, для которого ты хочешь добавить синоним,\nИ сам синоним в одном сообщении (через запятую)🤯")
     await state.set_state(AddAlias.waitingForSubjectNAlias)
-
+#------------------END------------------
 
 
 

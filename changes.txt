@@ -8,3 +8,8 @@ TGbot KeyGen&Handlers update
 TGbot registration&login update
 1. dbWorker updated
 2. All reg&login handlers are working properly
+
+TGbot release
+Fully working version includes next functionality:
+1. Proper Login&Registration, unregistered users now can't use bot
+2. All subject&task addition/deletion/redaction is fully working

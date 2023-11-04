@@ -1,11 +1,13 @@
 import re
 from dbWorker import dataBaseWorker
-def taskIsValid(line: str, worker: dataBaseWorker): # -> boolean
-    line = line.lower()
-    return True if re.fullmatch("добавь .+ на \d{2}.\d{2} .*",line) else False
+def isTaskValid(line: str, worker: dataBaseWorker): # -> boolean
+    return re.fullmatch("добавь .+ на ((0\d)|(1[012]))\.((0\d)|(1[012])) .*", line.lower())
 
-def subjectExists(subject_name:str, worker:dataBaseWorker): #-> boolean
-    return True if subject_name.lower() in worker.getSubjectsAliases() else False
+
+def isSubjectExists(subject_name:str, worker:dataBaseWorker): #-> boolean
+    return subject_name.lower() in worker.getSubjectsAliases()
+
+
 def prepareTask(line: str): # -> list[str]
     line = line.lower()
     # print(re.search("(?<=добавь ).*(?= на)",line))
@@ -26,3 +28,14 @@ def prepareSub(line:str):
     line = line.lower()
     subject = re.search("(?<=/newsub ).+",line).group()
     return subject
+
+
+def isUserNameValid(line:str): # -> boolean
+    return re.fullmatch(r"[\w\d]{4,64}",line)
+
+
+def isPasswordValid(line:str): # -> boolean
+    return re.fullmatch(r".{8,1024}", line)
+
+def isDateValid(line:str): # -> boolean
+    return re.fullmatch(r"((0\d)|(1[012]))\.((0\d)|(1[012]))", line)

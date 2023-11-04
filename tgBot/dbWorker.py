@@ -6,6 +6,7 @@ import json
 #сделать добавление задач
 logging.basicConfig(level=logging.INFO)
 class dataBaseWorker():
+    #------------------DATABASE--------------------
     def __init__(self,dbPath):
         self.dbPath = dbPath
         logging.log(20,"Checking tables")
@@ -53,8 +54,12 @@ class dataBaseWorker():
         cur.execute("CREATE TABLE IF NOT EXISTS OneTimeKeys (id INTEGER PRIMARY KEY AUTOINCREMENT, key_value TEXT)")
         base.commit(); cur.close(); base.close()
         logging.log(20,"Tables created successfully")
+#-----------------END------------------
 
 
+
+
+#---------------USER-------------------
     def isUserNAME(self, userName: str): # -> boolean
         base, cur = self.connectBase()
         reply = True if userName in [i[0] for i in cur.execute("SELECT user_name FROM Auth").fetchall()] else False
@@ -63,7 +68,7 @@ class dataBaseWorker():
         return reply
 
 
-    def isUserTG(self, tg_id:int): # -> boolean
+    def isUserTG(self, tg_id: int): # -> boolean
         base, cur = self.connectBase()
         # print([i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()])
         reply = True if tg_id in [i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()] else False
@@ -78,26 +83,6 @@ class dataBaseWorker():
         cur.execute("INSERT INTO Auth (user_name, tg_id, password) VALUES (?, ?, ?)", (userName, tg_id, keyGen.getHash(key)))
         cur.close(); base.commit(); base.close()
         logging.log(20,"Added new User")
-
-
-    def addTask(self, subject_name: str, date: str, description: str):
-        base, cur = self.connectBase()
-        aliases = self.getSubjectIDsAndAliases()
-        # print(aliases)
-        # print(data[0])
-        for i in aliases:
-            print(json.loads(i[1]))
-            if subject_name in json.loads(i[1]):subject_name=i[0]
-            subID = i[0]
-            print(subID)
-        cur.execute("INSERT INTO Tasks (subject_id, to_date, description) VALUES (?, ?, ?)", (subID,date,description))
-        cur.close(); base.commit(); base.close()
-        logging.log(20,"Added new task")
-
-
-    def delTask(self, id):
-        base, cur = self.connectBase()
-        cur.execute("DELETE FROM Tasks WHERE id = ?",(id,))
 
 
     def writeOneTimeKeys(self):
@@ -140,13 +125,44 @@ class dataBaseWorker():
         cur.execute(f"UPDATE Auth SET tg_id = ? WHERE user_name = ?",(tg_id, userName))
         logging.log(20, "Added tg_id to existing user")
         cur.close(); base.commit(); base.close()
+#-----------------------END-------------------------
+
+
+#-----------------------TASKS & SUBJECTS------------------------
+    def addTask(self, subject_name: str, date: str, description: str):
+        base, cur = self.connectBase()
+        aliases = self.getSubjectIDsAndAliases()
+        # print(aliases)
+        # print(data[0])
+        for i in aliases:
+            print(json.loads(i[1]))
+            if subject_name in json.loads(i[1]):subject_name=i[0]
+            subID = i[0]
+            print(subID)
+        cur.execute("INSERT INTO Tasks (subject_id, to_date, description) VALUES (?, ?, ?)", (subID,date,description))
+        cur.close(); base.commit(); base.close()
+        logging.log(20,"Added new task")
+
+
+    def delTask(self, id):
+        base, cur = self.connectBase()
+        cur.execute("DELETE FROM Tasks WHERE id = ?",(id,))
+        logging.log(20,"Deleted task")
+        cur.close(); base.commit(); base.close()
+
+
+    def markAsComplete(self, taskID: int, user_name: str):
+        base, cur = self.connectBase()
+        complete_tasks = json.loads(cur.execute("SELECT finished_tasks FROM Users WHERE user_name = ?",(user_name,)).fetchone()[0])+[taskID]
+        cur.execute("UPDATE Users SET finished_tasks = ? WHERE user_name = ?", (json.dumps(complete_tasks),user_name))
+        cur.close();base.commit();base.close()
+        logging.log(20,"Marked task as complete")
 
 
     def addSub(self,name):
         base, cur = self.connectBase()
         name = name.lower()
         cur.execute("INSERT INTO Subjects (subject_name, aliases) VALUES (?, ?)",(name,json.dumps([name])))
-        # print(cur.execute("SELECT subject_name FROM Subjects").fetchall())
         cur.close(); base.commit(); base.close()
         logging.log(20,"New subject added")
 
@@ -158,7 +174,7 @@ class dataBaseWorker():
         logging.log(20,"Subject deleted")
 
 
-    def getSubjectsAliases(self):
+    def getSubjectsAliases(self): # -> list [str]
         base, cur = self.connectBase()
         raw_subs = [json.loads(i[0]) for i in cur.execute("SELECT aliases FROM Subjects").fetchall()]
         print(raw_subs)
@@ -171,13 +187,14 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectNamesAndIDs(self):
+    def getSubjectNamesAndIDs(self): # -> list [(int, str),]
         base, cur = self.connectBase()
         l = cur.execute("SELECT id, subject_name FROM Subjects").fetchall()
         cur.close(); base.commit(); base.close()
         return l
 
-    def getSubjectNames(self):
+
+    def getSubjectNames(self): # -> list [str]
         base, cur = self.connectBase()
         subs = [i[0] for i in cur.execute("SELECT subject_name FROM Subjects").fetchall()]
         cur.close(); base.commit(); base.close()
@@ -185,7 +202,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectIDsAndAliases(self): #-> [[id,[aliases]]]
+    def getSubjectIDsAndAliases(self): #-> list [[id,[aliases]]]
         base, cur = self.connectBase()
         subs = cur.execute("SELECT id,aliases FROM Subjects").fetchall()
         print(subs)
@@ -194,21 +211,34 @@ class dataBaseWorker():
         return subs
 
 
-    def getTasks(self):
+    def getTasks(self, user_name: str): # -> list [(int, str),]
         base, cur = self.connectBase()
+        complete = json.loads(cur.execute("SELECT finished_tasks FROM Users WHERE user_name = ?", (user_name,)).fetchone()[0])
         tasks = cur.execute("SELECT id,description FROM Tasks").fetchall()
-        cur.close(); base.commit(); base.close()
+        tasks = [i for i in tasks if i[0] not in complete]
+        cur.close(); base.close()
         logging.log(20, "Fetched tasks")
         return tasks
 
+    def updateTask(self, task_id: int, date = "", description = ""):
+        base, cur = self.connectBase()
+        if date!="": cur.execute("UPDATE Tasks SET to_date = ? WHERE id = ?",(date,task_id))
+        else: cur.execute("UPDATE Tasks SET description = ? WHERE id = ?", (description,task_id))
+        cur.close();base.commit();base.close()
+        logging.log(20, "Updated Task")
+        pass
 
-    def getAllTasksWithSubjects(self):
+
+    def getUncompletedTasks(self, user_name): # -> str
         base, cur = self.connectBase()
         l = ""
         for sub in cur.execute("SELECT id, subject_name FROM Subjects").fetchall():
             print(sub[0])
-            tasks = cur.execute("SELECT subject_id, to_date, description FROM Tasks WHERE subject_id = ?", (sub[0],)).fetchall()
-            print(cur.execute("SELECT subject_id, to_date, description FROM Tasks").fetchall())
+            complete = json.loads(cur.execute("SELECT finished_tasks FROM Users WHERE user_name = ?",(user_name,)).fetchone()[0])
+            tasks = cur.execute("SELECT subject_id, to_date, description, id FROM Tasks WHERE subject_id = ?", (sub[0],)).fetchall()
+            print(tasks)
+            print(complete)
+            tasks = [i for i in tasks if i[3] not in complete]
             line = sub[1]+"\n"+"\n".join([i[1]+" - "+i[2] for i in tasks])+"\n"
             l+=line
         return l
@@ -217,8 +247,6 @@ class dataBaseWorker():
     def addAlias(self, subject_name: str, alias: str):
         base, cur = self.connectBase()
         subject_name, alias = subject_name.lower(), alias.lower()
-
-        # print(json.loads(cur.execute("SELECT aliases FROM Subjects WHERE subject_name = ?", (subject_name,)).fetchone()[0]))
         aliases = json.loads(cur.execute("SELECT aliases FROM Subjects WHERE subject_name = ?", (subject_name,)).fetchone()[0])+[alias]
         cur.execute("UPDATE Subjects SET aliases = ? WHERE subject_name = ?", (json.dumps(aliases),subject_name))
         cur.close(); base.commit(); base.close()
@@ -229,10 +257,27 @@ class dataBaseWorker():
         base, cur = self.connectBase()
         subject_name, alias = subject_name.lower(), alias.lower()
         raw_aliases = [json.loads(i[0]) for i in cur.execute("SELECT aliases FROM Subjects").fetchall()]
-        # print(cur.execute("SELECT aliases FROM Subjects").fetchall())
         aliases = []
         for i in raw_aliases:aliases.append(i)
-        # print(aliases)
         if not subject_name in [i[0] for i in cur.execute("SELECT subject_name FROM Subjects").fetchall()]:return 1
         elif alias in aliases:return 2
         return 0
+
+
+    def getUsers(self): # -> list [int,]
+        base, cur = self.connectBase()
+        data = [i[0] for i in cur.execute("SELECT tg_id FROM Auth").fetchall()]
+        cur.close();base.close()
+        return data
+
+
+    def getUserNameByTGID(self, tgID: int): # -> str
+        base, cur = self.connectBase()
+        userName = cur.execute("SELECT user_name FROM Auth WHERE tg_id = ?", (tgID,)).fetchone()[0]
+        cur.close();base.close()
+        return userName
+
+
+if __name__ == "__main__":
+    db = dataBaseWorker("../db.db")
+    print(db.getUsers())

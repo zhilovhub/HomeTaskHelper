@@ -5,6 +5,8 @@ import random
 from string import digits,ascii_lowercase,ascii_uppercase
 alph = digits+ascii_uppercase+ascii_lowercase
 logging.basicConfig(level=logging.INFO)
+
+
 def generateKeys(n: int): # -> list[str] - hashes
     hl = []; kl = []
     for i in range(n):
@@ -16,4 +18,6 @@ def generateKeys(n: int): # -> list[str] - hashes
     logging.log(20,"Key(s) has(have) been saved to txt and passed to worker")
     return hl
 
-def getHash(key): return keccak.new(digest_bits=256).update(key.encode("utf-8")).hexdigest() # -> str - hash
+
+def getHash(key):
+    return keccak.new(digest_bits=256).update(key.encode("utf-8")).hexdigest() # -> str - hash

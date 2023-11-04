@@ -19,6 +19,17 @@ interface LocalDatabaseDao {
 
     // TRANSACTIONS
     @Transaction
+    suspend fun acceptRedacting(
+        subjects: List<Subject>,
+        tasks: List<Task>,
+        tasksToDelete: List<Task>
+    ) {
+        transactionInsertSubjectsInsertTasks(subjects, tasks)
+        deleteTasks(tasksToDelete)
+        updateIsRedacting(false)
+    }
+
+    @Transaction
     suspend fun transactionInsertSubjectsInsertTasks(subjects: List<Subject>, tasks: List<Task>) {
         val cache = mutableMapOf<Int, Int>()
         var newId: Long
@@ -82,8 +93,8 @@ interface LocalDatabaseDao {
     @Update
     suspend fun updateTask(task: Task)
 
-    @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = 0")
-    suspend fun updateTasksIsRedacting()
+    @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = :isRedacting")
+    suspend fun updateIsRedacting(isRedacting: Boolean)
 
     @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
     suspend fun updateSubjectName(subjectId: Int, subjectName: String)

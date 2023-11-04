@@ -54,24 +54,16 @@ fun Tasks(
                     viewModel.updateUserState(it)
                 },
                 updateSubjectName = {
-//                    if (!tasks[task.id]!!.isRedacting) {
-//                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
-//                    }
-//                    tasks[task.id] = tasks[task.id]!!.copy(subjectName = it, isRedacting = true)  // TODO update task's isRedacting
-                    viewModel.updateSubjectName(task.subjectId, it)
+                    viewModel.updateSubjectName(task, task.subjectId, it)
                 },
                 updateTaskDescription = {
-//                    if (!tasks[task.id]!!.isRedacting) {
-//                        viewModel.updateTask(tasks[task.id]!!.copy(isRedacting = true).toTask())
-//                    }
-//                    tasks[task.id] = tasks[task.id]!!.copy(description = it, isRedacting = true)  // TODO update task's isRedacting
                     viewModel.updateTaskDescription(task, it)
                 },
                 updateTaskIsFinished = {
                     viewModel.updateTaskIsFinished(task, it)
                 },
                 deleteTask = {
-                    viewModel.deleteTask(task)  // TODO update task's isRedacting
+                    viewModel.deleteTask(task)
                 }
             )
         }

@@ -22,16 +22,20 @@ class AppRepository(
         return databaseDao.selectAllSubjects()
     }
 
-    suspend fun insertSubjectsAndTasks(subjects: List<Subject>, tasks: List<Task>) {
-        databaseDao.transactionInsertSubjectsInsertTasks(subjects, tasks)
+    suspend fun acceptRedacting(
+        subjects: List<Subject>,
+        tasks: List<Task>,
+        tasksToDelete: List<Task>
+    ) {
+        databaseDao.acceptRedacting(subjects, tasks, tasksToDelete)
     }
 
     suspend fun updateTask(task: Task) {
         databaseDao.updateTask(task)
     }
 
-    suspend fun deleteTasks(tasks: List<Task>) {
-        databaseDao.deleteTasks(tasks)
+    suspend fun updateIsRedacting(isRedacting: Boolean) {
+        databaseDao.updateIsRedacting(isRedacting)
     }
 
     // Network

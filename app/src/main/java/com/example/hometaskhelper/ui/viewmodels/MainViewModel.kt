@@ -90,7 +90,7 @@ class MainViewModel(
     }
 
     fun resetIsRedactingTasks() {
-//        coroutineScope.launch { repository.cancelRedacting() }  TODO send isRedacting = False to DB
+        coroutineScope.launch { repository.updateIsRedacting(false) }
     }
 
     fun acceptRedacting() {
@@ -101,11 +101,11 @@ class MainViewModel(
         val tasks = _tasksState.value.tasks
 
         coroutineScope.launch {
-            repository.insertSubjectsAndTasks(
+            repository.acceptRedacting(
                 subjects = _tasksState.value.subjects.map { it.value.toSubject() },
-                tasks = tasks.map { getTask(it.toTask()) }
+                tasks = tasks.map { getTask(it.toTask()) },
+                tasksToDelete = tasks.filter { it.isDeleted }.map { it.toTask() }
             )
-            repository.deleteTasks(tasks.filter { it.isDeleted }.map { it.toTask() })
         }
     }
 
@@ -113,6 +113,7 @@ class MainViewModel(
         val newTasks = _tasksState.value.tasks.toMutableList()
         val index = newTasks.indexOfFirst { it.id == task.id }
         newTasks[index] = task.copy(isDeleted = true)
+        updateTaskIsRedacting(task)
         _tasksState.update {
             _tasksState.value.copy(tasks = newTasks)
         }
@@ -130,6 +131,7 @@ class MainViewModel(
     fun updateTaskDescription(task: ModelTask, description: String) {
         val newTasks = _tasksState.value.tasks.toMutableList()
         val index = newTasks.indexOfFirst { it.id == task.id }
+        updateTaskIsRedacting(task)
         newTasks[index] = task.copy(description = description)
         _tasksState.update {
             _tasksState.value.copy(
@@ -138,11 +140,12 @@ class MainViewModel(
         }
     }
 
-    fun updateSubjectName(subjectId: Int, subjectName: String) {
+    fun updateSubjectName(task: ModelTask, subjectId: Int, subjectName: String) {
         val newSubjects = _tasksState.value.subjects.toMutableMap()
         if (newSubjects.containsKey(subjectId)) {
             newSubjects[subjectId] = newSubjects[subjectId]?.copy(subjectName = subjectName) ?: ModelSubject()
         }
+        updateTaskIsRedacting(task)
         _tasksState.update {
             _tasksState.value.copy(
                 subjects = newSubjects.toMap()
@@ -161,8 +164,16 @@ class MainViewModel(
         }
     }
 
-    fun updateTask(task: Task) {
-        coroutineScope.launch { repository.updateTask(task) }
+    private fun updateTaskIsRedacting(task: ModelTask) {
+        if (!task.isRedacting) {
+            val newTask = task.copy(isRedacting = true)
+            coroutineScope.launch {
+                repository.updateTask(newTask.toTask())
+                _tasksState.update {
+                    _tasksState.value.copy(tasks = _tasksState.value.tasks.map { if (it.id == task.id) newTask else it })
+                }
+            }
+        }
     }
     
     override fun onCleared() {

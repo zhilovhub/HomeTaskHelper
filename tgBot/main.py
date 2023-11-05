@@ -1,13 +1,15 @@
-from cfg import TOKEN,WEBHOOK_PATH,WEBHOOK_SECRET,WEB_SERVER_HOST,WEB_SERVER_PORT,BASE_WEBHOOK_URL
+from cfg import TOKEN,WEBHOOK_PATH,WEBHOOK_SECRET,WEB_SERVER_HOST,WEB_SERVER_PORT,BASE_WEBHOOK_URL,SSL_PEM,SSL_KEY
 from handlers import r
 import dbWorker
 import asyncio
 import platform
 from aiohttp import web
 import logging
+import ssl
 from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import *
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import FSInputFile
 
 
 async def dropWebhook(bot):
@@ -16,7 +18,7 @@ async def dropWebhook(bot):
 
 async def makeWebhook(bot):
     await dropWebhook(bot)
-    await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}", secret_token=WEBHOOK_SECRET)
+    await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}",certificate=FSInputFile(SSL_PEM))
 
 
 def setupWebApp(bot,dp):
@@ -25,7 +27,9 @@ def setupWebApp(bot,dp):
     webhookRequestHandler = SimpleRequestHandler(bot,dp)
     webhookRequestHandler.register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
-    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    context.load_cert_chain(SSL_PEM, SSL_KEY)
+    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT,ssl_context=context)
 
 
 def setupBot():
@@ -35,14 +39,14 @@ def setupBot():
     return bot,dp
 
 
-async def main():
-    await startBot(*setupBot())
+def main():
+    startBot(*setupBot())
 
 
-async def startBot(bot,dp):
+def startBot(bot,dp):
     if platform.system() in ["Darwin","Windows"]:
-        await dropWebhook(bot)
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+        dropWebhook(bot)
+        dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     else:
         setupWebApp(bot,dp)
 

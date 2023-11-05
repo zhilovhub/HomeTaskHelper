@@ -1,7 +1,7 @@
 import re
 from dbWorker import dataBaseWorker
 def isTaskValid(line: str, worker: dataBaseWorker): # -> boolean
-    return re.fullmatch("добавь .+ на ((0\d)|(1[012]))\.((0\d)|(1[012])) .*", line.lower())
+    return re.fullmatch("добавь .+ на ((0\d)|(1\d)|(2\d)|(3[01]))\.((0\d)|(1[012])) .*", line.lower())
 
 
 def isSubjectExists(subject_name:str, worker:dataBaseWorker): #-> boolean
@@ -38,4 +38,4 @@ def isPasswordValid(line:str): # -> boolean
     return re.fullmatch(r".{8,1024}", line)
 
 def isDateValid(line:str): # -> boolean
-    return re.fullmatch(r"((0\d)|(1[012]))\.((0\d)|(1[012]))", line)
+    return re.fullmatch(r"((0\d)|(1\d)|(2\d)|(3[01]))\.((0\d)|(1[012]))", line)

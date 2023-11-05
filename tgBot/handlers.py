@@ -156,6 +156,7 @@ async def parsePassword(message: types.Message, state: FSMContext):
     userData = await state.get_data()
     if not db.checkPassword(userData["userName"],message.text):
         await message.answer("Пароль неверный🫤")
+        return
     db.addTelegramToExisting(message.chat.id,userData["userName"])
     await message.delete()
     await message.answer("Авторизация прошла успешно🙃")

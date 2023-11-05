@@ -2,24 +2,30 @@ from cfg import TOKEN,WEBHOOK_PATH,WEBHOOK_SECRET,WEB_SERVER_HOST,WEB_SERVER_POR
 from handlers import r
 import dbWorker
 import asyncio
-import os
+import platform
 from aiohttp import web
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import *
 from aiogram.fsm.storage.memory import MemoryStorage
-async def makeWebhook(bot):
+
+
+async def dropWebhook(bot):
     await bot.delete_webhook(drop_pending_updates=True)
+
+
+async def makeWebhook(bot):
+    await dropWebhook(bot)
     await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}", secret_token=WEBHOOK_SECRET)
 
 
-async def setupWebApp(bot,dp):
+def setupWebApp(bot,dp):
     dp.startup.register(makeWebhook)
     app = web.Application()
     webhookRequestHandler = SimpleRequestHandler(bot,dp)
     webhookRequestHandler.register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
-    await web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
+    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 
 def setupBot():
@@ -34,10 +40,11 @@ async def main():
 
 
 async def startBot(bot,dp):
-    if os.name in ["posix","Windows"]:
+    if platform.system() in ["Darwin","Windows"]:
+        await dropWebhook(bot)
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     else:
-        await setupWebApp(bot,dp)
+        setupWebApp(bot,dp)
 
 
 if __name__=="__main__":

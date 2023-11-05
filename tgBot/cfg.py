@@ -7,5 +7,8 @@ WEBHOOK_PATH = ""
 WEBHOOK_SECRET = ""
 # Base URL for webhook will be used to generate webhook URL for Telegram,
 # in this example it is used public DNS with HTTPS support
-BASE_WEBHOOK_URL = ""
-DB_PATH = "db.db"
+BASE_WEBHOOK_URL = "194.87.252.94"
+DB_PATH = "TeleTask"
+DB_USER = "tg_bot"
+DB_PASSWORD = "12345678"
+DB_HOST = "localhost"

@@ -303,6 +303,9 @@ async def prepToDelSubject(message: types.Message, state: FSMContext):
 
 @r.message(AddAlias.waitingForSubjectNAlias)
 async def addAlias(message: types.Message, state: FSMContext):
+    if len(message.text.split())!=2:
+        await message.answer("Название предмета и синоним надо писать через запятую в одном сообщении🤡")
+        return
     subject_name, alias = matcher.prepareAlias(message.text)
     print(subject_name, alias)
     reply = db.aliasIsValid(subject_name,alias)

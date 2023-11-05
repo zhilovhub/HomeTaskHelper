@@ -1,12 +1,11 @@
 TOKEN = "1634628039:AAGbIRu7yNWoIPfSbT8cqc9bq9ebxNc0oRs"
+SSL_PEM = "ssl_cert/cert.pem"
+SSL_KEY = "ssl_cert/private.key"
 WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = 8080
 # Path to webhook route, on which Telegram will send requests
-WEBHOOK_PATH = ""
-# Secret key to validate requests from Telegram (optional)
-WEBHOOK_SECRET = ""
-# Base URL for webhook will be used to generate webhook URL for Telegram,
-# in this example it is used public DNS with HTTPS support
+WEBHOOK_PATH = "/1"
+WEBHOOK_SECRET = "A"
 BASE_WEBHOOK_URL = "194.87.252.94"
 DB_PATH = "TeleTask"
 DB_USER = "tg_bot"

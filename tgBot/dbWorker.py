@@ -96,9 +96,9 @@ class dataBaseWorker():
         logging.log(20,"Added new User")
 
 
-    def writeOneTimeKeys(self):
+    def writeOneTimeKeys(self, val =34):
         base, cur = self.connectBase()
-        values = keyGen.generateKeys(34)
+        values = keyGen.generateKeys(val)
         print(values)
 
         for v in values:
@@ -111,7 +111,7 @@ class dataBaseWorker():
         h = keyGen.getHash(key)
         base, cur = self.connectBase()
         cur.execute("SELECT key_value FROM OneTimeKeys")
-        l = [i[0] for i in cur.fetchall()] # -> JSON[str] - hashes
+        l = [i[0] for i in cur.fetchall()] # -> list[str] - hashes
         cur.close(); base.close()
         # print(h,"\n",l)
         isValid = True if h in l else False
@@ -190,7 +190,7 @@ class dataBaseWorker():
         logging.log(20,"Subject deleted")
 
 
-    def getSubjectsAliases(self): # -> JSON [str]
+    def getSubjectsAliases(self): # -> list [str]
         base, cur = self.connectBase()
         cur.execute("SELECT aliases FROM Subjects")
         raw_subs = [json.loads(i[0]) for i in cur.fetchall()]
@@ -204,7 +204,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectNamesAndIDs(self): # -> JSON [(int, str),]
+    def getSubjectNamesAndIDs(self): # -> list [(int, str),]
         base, cur = self.connectBase()
         cur.execute("SELECT id, subject_name FROM Subjects")
         l = cur.fetchall()
@@ -212,16 +212,16 @@ class dataBaseWorker():
         return l
 
 
-    def getSubjectNames(self): # -> JSON [str]
+    def getSubjectNamesAndAliases(self): # -> list [(str, json([str]))]
         base, cur = self.connectBase()
-        cur.execute("SELECT subject_name FROM Subjects")
-        subs = [i[0] for i in cur.fetchall()]
+        cur.execute("SELECT subject_name, aliases FROM Subjects")
+        subs = cur.fetchall()
         cur.close(); base.commit(); base.close()
         logging.log(20,"Fetched subject_name's")
         return subs
 
 
-    def getSubjectIDsAndAliases(self): #-> JSON [[id,[aliases]]]
+    def getSubjectIDsAndAliases(self): #-> list [[id,[aliases]]]
         base, cur = self.connectBase()
         cur.execute("SELECT id,aliases FROM Subjects")
         subs = cur.fetchall()
@@ -231,7 +231,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getTasks(self, user_name: str): # -> JSON [(int, str),]
+    def getTasks(self, user_name: str): # -> list [(int, str),]
         base, cur = self.connectBase()
         cur.execute("SELECT finished_tasks FROM Users WHERE user_name = %s", (user_name,))
         complete = json.loads(cur.fetchone()[0])
@@ -292,7 +292,7 @@ class dataBaseWorker():
         return 0
 
 
-    def getUsers(self): # -> JSON [int,]
+    def getUsers(self): # -> list [int,]
         base, cur = self.connectBase()
         cur.execute("SELECT tg_id FROM Auth")
         data = [i[0] for i in cur.fetchall()]
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     while(True):
         i = getInput()
         if i == "0":
-            db.writeOneTimeKeys()
+            db.writeOneTimeKeys(int(input("enter a number of keys")))
         elif i=="1":
             db.dropTables()
             db.createTables()

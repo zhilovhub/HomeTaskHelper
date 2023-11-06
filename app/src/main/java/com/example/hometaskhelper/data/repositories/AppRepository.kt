@@ -38,6 +38,14 @@ class AppRepository(
         databaseDao.updateIsRedacting(isRedacting)
     }
 
+    suspend fun updateLocalIds() {
+        databaseDao.updateLocalIds()
+    }
+
+    suspend fun cleanDb() {
+        databaseDao.cleanDb()
+    }
+
     // Network
 }
 

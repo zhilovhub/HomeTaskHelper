@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.hometaskhelper.TASK_SHOULD_CHECK
+import com.example.hometaskhelper.TASK_SHOULD_UPDATE
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.datasources.database.entities.User
@@ -18,6 +20,12 @@ import kotlinx.coroutines.flow.Flow
 interface LocalDatabaseDao {
 
     // TRANSACTIONS
+    @Transaction
+    suspend fun cleanDb() {
+        deleteCheckDeletedTasks()
+        updateStates()
+    }
+
     @Transaction
     suspend fun acceptRedacting(
         subjects: List<Subject>,
@@ -99,10 +107,19 @@ interface LocalDatabaseDao {
     @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
     suspend fun updateSubjectName(subjectId: Int, subjectName: String)
 
+    @Query("UPDATE ${Task.TABLE_NAME} SET local_id = id")
+    suspend fun updateLocalIds()
+
+    @Query("UPDATE ${Task.TABLE_NAME} SET state = null WHERE state = '$TASK_SHOULD_UPDATE'")
+    suspend fun updateStates()
+
     // DELETE
     @Delete
     suspend fun deleteTasks(tasks: List<Task>)
 
     @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_redacting = 1")
     suspend fun deleteAllRedactingTasks()
+
+    @Query("DELETE FROM ${Task.TABLE_NAME} WHERE is_deleted = 1 and state = '$TASK_SHOULD_CHECK'")
+    suspend fun deleteCheckDeletedTasks()
 }

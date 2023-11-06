@@ -48,6 +48,10 @@ fun HomeScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP || event == Lifecycle.Event.ON_START) {
                 viewModel.resetIsRedactingTasks()
+                viewModel.updateLocalIds()
+                if (event == Lifecycle.Event.ON_STOP) {
+//                    viewModel.resetCheckTasks()
+                }
             }
         }
 

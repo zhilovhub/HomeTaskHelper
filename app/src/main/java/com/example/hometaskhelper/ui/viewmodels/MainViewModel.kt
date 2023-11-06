@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
+import com.example.hometaskhelper.TASK_SHOULD_CHECK
+import com.example.hometaskhelper.TASK_SHOULD_UPDATE
 import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
@@ -37,8 +39,11 @@ class MainViewModel(
 
     init {
         coroutineScope.launch {
-            repository.getAllTasks().collect { newTasks ->  // TODO if userState != Default - dont't do it. Work with tempTasks and this
-                _tasksState.update { tasksUiState -> tasksUiState.copy(tasks = newTasks) }
+            repository.getAllTasks().collect { newTasks ->  // TODO if userState != Default - don't do it. Work with tempTasks and this
+                _tasksState.update { tasksUiState ->
+                    tasksUiState.copy(tasks = mergeIncomingChangesWithLocal(newTasks))
+                }
+                repository.cleanDb()
             }
         }
         coroutineScope.launch {
@@ -74,7 +79,9 @@ class MainViewModel(
             toDate = "",
             isRedacting = true,
             isFinished = false,
-            isDeleted = false
+            isDeleted = false,
+            localId = taskId,
+            state = null
         )
         _tasksState.update {
             _tasksState.value.copy(
@@ -164,6 +171,12 @@ class MainViewModel(
         }
     }
 
+    fun updateLocalIds() {
+        coroutineScope.launch {
+            repository.updateLocalIds()
+        }
+    }
+
     private fun updateTaskIsRedacting(task: ModelTask) {
         if (!task.isRedacting) {
             val newTask = task.copy(isRedacting = true)
@@ -174,6 +187,58 @@ class MainViewModel(
                 }
             }
         }
+    }
+
+    private fun mergeIncomingChangesWithLocal(incomingTasks: List<ModelTask>): List<ModelTask> {  // TODO transform this func to Network. Now it just for one people
+        val newTasks = _tasksState.value.tasks.toMutableList()
+        val newTasksIndexes = _tasksState.value.tasks.map { it.id }
+
+        var incomingTask: ModelTask
+        var incomingLocalId: Int?
+        var incomingTaskState: String?
+
+        for (index in incomingTasks.indices) {
+            incomingTask = incomingTasks[index]
+            incomingLocalId = incomingTask.localId
+            incomingTaskState = incomingTask.state
+
+            when (incomingTaskState) {  // Not my task
+                TASK_SHOULD_CHECK -> {
+                    if (incomingTask.isDeleted) {  // Delete not my task
+                        newTasks.removeIf { it.id == incomingLocalId }
+                    } else if (newTasksIndexes.contains(incomingLocalId)) {  // Update not my task
+                        newTasks.replaceAll { if (it.id == incomingLocalId) resetIncomingTask(incomingTask) else it }
+                    } else if (!newTasksIndexes.contains(incomingLocalId)) {  // Add not my task
+                        newTasks.add(index, resetIncomingTask(incomingTask))
+                    }
+                }
+                TASK_SHOULD_UPDATE -> {  // Should update my task in local
+                    newTasks.replaceAll {
+                        if (it.id == incomingLocalId) resetIncomingTask(
+                            incomingTask, incomingTask.isRedacting, incomingTask.isDeleted
+                        )
+                        else it
+                    }
+                }
+                else -> newTasks.add(incomingTask)
+            }
+        }
+        // TODO add new task that is not mine (state = check)
+        // TODO delete task that is not mine (deleted = 1 and state = check)
+        // TODO if state is check - add or redact these task. This task is not mine
+        // TODO if state is update - update task. This is mine and it defines that task is ready to be updated local
+        // TODO if state is null - nothing to do
+        // TODO clean db (delete deleted = 1 and state = check tasks; set state = null where state = update)
+
+        return incomingTasks
+    }
+
+    private fun resetIncomingTask(
+        task: ModelTask,
+        isRedacting: Boolean = false,
+        isDeleted: Boolean = false
+    ): ModelTask {
+        return task.copy(isRedacting = isRedacting, isDeleted = isDeleted, state = null)
     }
     
     override fun onCleared() {

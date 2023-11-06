@@ -38,7 +38,13 @@ data class Task(
     val isFinished: Boolean,
 
     @ColumnInfo(name = "is_deleted", defaultValue = "false")
-    val isDeleted: Boolean
+    val isDeleted: Boolean,
+
+    @ColumnInfo(name = "local_id")
+    val localId: Int?,
+
+    @ColumnInfo(name = "state")
+    val state: String?
 ) {
     companion object {
         const val TABLE_NAME = "Tasks"

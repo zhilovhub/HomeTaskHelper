@@ -1,6 +1,7 @@
 package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
@@ -39,11 +40,11 @@ class MainViewModel(
 
     init {
         coroutineScope.launch {
-            repository.getAllTasks().collect { newTasks ->  // TODO if userState != Default - don't do it. Work with tempTasks and this
+            repository.getAllTasks().collect { newTasks ->
                 _tasksState.update { tasksUiState ->
                     tasksUiState.copy(tasks = mergeIncomingChangesWithLocal(newTasks))
                 }
-                repository.cleanDb()
+                repository.cleanDb(state = TASK_SHOULD_UPDATE)
             }
         }
         coroutineScope.launch {
@@ -98,6 +99,10 @@ class MainViewModel(
 
     fun resetIsRedactingTasks() {
         coroutineScope.launch { repository.updateIsRedacting(false) }
+    }
+
+    fun resetCheckTasks() {
+        coroutineScope.launch { repository.cleanDb(state = TASK_SHOULD_CHECK)}
     }
 
     fun acceptRedacting() {
@@ -207,20 +212,30 @@ class MainViewModel(
                     if (incomingTask.isDeleted) {  // Delete not my task
                         newTasks.removeIf { it.id == incomingLocalId }
                     } else if (newTasksIndexes.contains(incomingLocalId)) {  // Update not my task
-                        newTasks.replaceAll { if (it.id == incomingLocalId) resetIncomingTask(incomingTask) else it }
+                        newTasks.replaceAll {
+                            if (it.id == incomingLocalId)
+                                incomingTask.copy(
+                                    isRedacting = false, isDeleted = false, state = null
+                                )
+                            else it
+                        }
                     } else if (!newTasksIndexes.contains(incomingLocalId)) {  // Add not my task
-                        newTasks.add(index, resetIncomingTask(incomingTask))
+                        newTasks.add(index, incomingTask.copy(
+                            isRedacting = false, isDeleted = false, state = null
+                        ))
                     }
                 }
                 TASK_SHOULD_UPDATE -> {  // Should update my task in local
                     newTasks.replaceAll {
-                        if (it.id == incomingLocalId) resetIncomingTask(
-                            incomingTask, incomingTask.isRedacting, incomingTask.isDeleted
+                        if (it.id == incomingLocalId) incomingTask.copy(
+                            isRedacting = incomingTask.isRedacting,
+                            isDeleted = incomingTask.isDeleted,
+                            state = null
                         )
                         else it
                     }
                 }
-                else -> newTasks.add(incomingTask)
+                else -> if (!newTasksIndexes.contains(incomingLocalId)) newTasks.add(incomingTask)
             }
         }
         // TODO add new task that is not mine (state = check)
@@ -230,15 +245,13 @@ class MainViewModel(
         // TODO if state is null - nothing to do
         // TODO clean db (delete deleted = 1 and state = check tasks; set state = null where state = update)
 
-        return incomingTasks
-    }
 
-    private fun resetIncomingTask(
-        task: ModelTask,
-        isRedacting: Boolean = false,
-        isDeleted: Boolean = false
-    ): ModelTask {
-        return task.copy(isRedacting = isRedacting, isDeleted = isDeleted, state = null)
+        // TODO version 1.0 is finished. Now we need to work with update state.
+        //  When state = update we shouldn't update all fields. Only is_redacting, is_deleting idk for example
+        //  Also we need to send these state to db. In local - only update. Check is on websocket
+        //  Also we need to handle situation when we cancelling. Because tempTasks are not changing. Maybe change tempTasks there too (only with check tasks)
+
+        return newTasks
     }
     
     override fun onCleared() {

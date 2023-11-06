@@ -42,8 +42,8 @@ class AppRepository(
         databaseDao.updateLocalIds()
     }
 
-    suspend fun cleanDb() {
-        databaseDao.cleanDb()
+    suspend fun cleanDb(state: String) {
+        databaseDao.cleanDb(state)
     }
 
     // Network

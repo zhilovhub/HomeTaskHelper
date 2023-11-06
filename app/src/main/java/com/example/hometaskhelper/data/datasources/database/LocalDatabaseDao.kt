@@ -21,9 +21,9 @@ interface LocalDatabaseDao {
 
     // TRANSACTIONS
     @Transaction
-    suspend fun cleanDb() {
+    suspend fun cleanDb(state: String) {
         deleteCheckDeletedTasks()
-        updateStates()
+        updateStates(state)
     }
 
     @Transaction
@@ -110,8 +110,8 @@ interface LocalDatabaseDao {
     @Query("UPDATE ${Task.TABLE_NAME} SET local_id = id")
     suspend fun updateLocalIds()
 
-    @Query("UPDATE ${Task.TABLE_NAME} SET state = null WHERE state = '$TASK_SHOULD_UPDATE'")
-    suspend fun updateStates()
+    @Query("UPDATE ${Task.TABLE_NAME} SET state = null WHERE state = :state")
+    suspend fun updateStates(state: String)
 
     // DELETE
     @Delete

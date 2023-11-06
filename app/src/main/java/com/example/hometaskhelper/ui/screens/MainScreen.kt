@@ -50,7 +50,7 @@ fun HomeScreen(
                 viewModel.resetIsRedactingTasks()
                 viewModel.updateLocalIds()
                 if (event == Lifecycle.Event.ON_STOP) {
-//                    viewModel.resetCheckTasks()
+                    viewModel.resetCheckTasks()
                 }
             }
         }

@@ -39,13 +39,13 @@ def setupBot():
     return bot,dp
 
 
-async def main():
+async def main_poll():
     bot,dp = setupBot()
-    if platform.system() in ["Darwin", "Windows"]:
-        await startBot(bot,dp)
-    else:
-        setupWebApp(bot,dp)
+    await startBot(bot,dp)
 
+def main_webhook():
+    bot, dp = setupBot()
+    setupWebApp(bot, dp)
 
 async def startBot(bot,dp):
     await dropWebhook(bot)
@@ -54,4 +54,7 @@ async def startBot(bot,dp):
 
 if __name__=="__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
+    if platform.system() in ["Darwin", "Windows"]:
+        asyncio.run(main_poll())
+    else:
+        asyncio.run(main_webhook())

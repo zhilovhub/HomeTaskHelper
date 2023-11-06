@@ -24,6 +24,10 @@ def prepareAlias(line:str): # -> list[str]
     return [subject,alias]
 
 
+def isAliasStringValid(line:str): # -> boolean
+    return re.fullmatch(".+,.+",line)
+
+
 def prepareSub(line:str):
     line = line.lower()
     subject = re.search("(?<=/newsub ).+",line).group()

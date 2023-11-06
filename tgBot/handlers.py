@@ -8,6 +8,7 @@ from aiogram.fsm.state import StatesGroup, State
 import re
 from cfg import DB_PATH
 import matcher
+import json
 r = Router()
 db = dbWorker.dataBaseWorker(DB_PATH)
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +63,10 @@ async def help(message: types.Message, state: FSMContext):
     /delsub - показывает меню, выбрав элемент которого будет удален соответствующий предмет
     /addalias - добавляет синоним для предмета, чтобы ты мог написать как линал, так и линейка или ЛиНеЙнАя АлГеБра🤓
     /listtasks - показывает всю домашку
+    /listsubs - показывает предметы
+    /deltask - показывает меню, выбрав элемент которого будет удалено соответствующее задание
     /cancel - отменяет текущее действие
+    
     
     Чтобы добавить домашку отправь сообщение в следующем формате:
     Добавь (название предмета) на (дата вида ДД.ММ) (текст задания)
@@ -303,7 +307,7 @@ async def prepToDelSubject(message: types.Message, state: FSMContext):
 
 @r.message(AddAlias.waitingForSubjectNAlias)
 async def addAlias(message: types.Message, state: FSMContext):
-    if len(message.text.split())!=2:
+    if not matcher.isAliasStringValid(message.text):
         await message.answer("Название предмета и синоним надо писать через запятую в одном сообщении🤡")
         return
     subject_name, alias = matcher.prepareAlias(message.text)
@@ -331,5 +335,11 @@ async def startAddAlias(message: types.Message, state: FSMContext):
     await state.set_state(AddAlias.waitingForSubjectNAlias)
 
 
+@r.message(Command("listsubs"),F.from_user.id.in_(users))
+async def listsubs(message: types.Message, state: FSMContext):
+    subs = db.getSubjectNamesAndAliases()
+    l = '\n'.join([f"{i[0].capitalize()} aka " + ', '.join(json.loads(i[1])) for i in subs])
+    print(l)
+    await message.answer(l)
 
 

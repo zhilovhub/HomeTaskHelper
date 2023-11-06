@@ -96,9 +96,9 @@ class dataBaseWorker():
         logging.log(20,"Added new User")
 
 
-    def writeOneTimeKeys(self):
+    def writeOneTimeKeys(self, val =34):
         base, cur = self.connectBase()
-        values = keyGen.generateKeys(34)
+        values = keyGen.generateKeys(val)
         print(values)
 
         for v in values:
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     while(True):
         i = getInput()
         if i == "0":
-            db.writeOneTimeKeys()
+            db.writeOneTimeKeys(int(input("enter a number of keys")))
         elif i=="1":
             db.dropTables()
             db.createTables()

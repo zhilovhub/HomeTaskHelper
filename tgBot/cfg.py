@@ -1,6 +1,6 @@
 TOKEN = "1634628039:AAGbIRu7yNWoIPfSbT8cqc9bq9ebxNc0oRs"
-SSL_PEM = "ssl_cert/cert.pem"
-SSL_KEY = "ssl_cert/private.key"
+SSL_PEM = "~/ssl_cert/cert.pem"
+SSL_KEY = "~/ssl_cert/private.key"
 WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = 8080
 # Path to webhook route, on which Telegram will send requests

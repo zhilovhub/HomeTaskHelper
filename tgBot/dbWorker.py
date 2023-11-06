@@ -192,13 +192,11 @@ class dataBaseWorker():
 
     def getSubjectsAliases(self): # -> list [str]
         base, cur = self.connectBase()
-        cur.execute("SELECT aliases FROM Subjects")
-        raw_subs = [json.loads(i[0]) for i in cur.fetchall()]
-        print(raw_subs)
+        cur.execute("SELECT aliases FROM Subjects")#[json([str]),]
+        raw_subs = cur.fetchall()
         subs = []
         for i in raw_subs:
-            for a in i: subs.append(a)
-        print(subs)
+            for a in json.loads(i[0]): subs.append(a)
         cur.close(); base.commit(); base.close()
         logging.log(20,"Fetched all aliases from subject")
         return subs
@@ -282,13 +280,14 @@ class dataBaseWorker():
     def aliasIsValid(self, subject_name, alias): #-> 0,1,2 : 0-is valid, 1-subject_name not found, 2-alias already exists
         base, cur = self.connectBase()
         subject_name, alias = subject_name.lower(), alias.lower()
-        cur.execute("SELECT aliases FROM Subjects")
-        raw_aliases = [json.loads(i[0]) for i in cur.fetchall()]
-        aliases = []
-        for i in raw_aliases:aliases.append(i)
+        cur.execute("SELECT aliases FROM Subjects")  # [json([str]),]
+        raw_subs = cur.fetchall()
+        subs = []
+        for i in raw_subs:
+            for a in json.loads(i[0]): subs.append(a)
         cur.execute("SELECT subject_name FROM Subjects")
         if not subject_name in [i[0] for i in cur.fetchall()]:return 1
-        elif alias in aliases:return 2
+        elif alias in subs:return 2
         return 0
 
 

@@ -38,10 +38,6 @@ class AppRepository(
         databaseDao.updateIsRedacting(isRedacting)
     }
 
-    suspend fun updateLocalIds() {
-        databaseDao.updateLocalIds()
-    }
-
     suspend fun cleanDb(state: String) {
         databaseDao.cleanDb(state)
     }

@@ -40,9 +40,6 @@ data class Task(
     @ColumnInfo(name = "is_deleted", defaultValue = "false")
     val isDeleted: Boolean,
 
-    @ColumnInfo(name = "local_id")
-    val localId: Int?,
-
     @ColumnInfo(name = "state")
     val state: String?
 ) {

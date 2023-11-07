@@ -101,14 +101,11 @@ interface LocalDatabaseDao {
     @Update
     suspend fun updateTask(task: Task)
 
-    @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = :isRedacting")
+    @Query("UPDATE ${Task.TABLE_NAME} SET is_redacting = :isRedacting, state = '$TASK_SHOULD_UPDATE'")
     suspend fun updateIsRedacting(isRedacting: Boolean)
 
     @Query("UPDATE ${Subject.TABLE_NAME} SET subject_name = :subjectName WHERE id = :subjectId")
     suspend fun updateSubjectName(subjectId: Int, subjectName: String)
-
-    @Query("UPDATE ${Task.TABLE_NAME} SET local_id = id")
-    suspend fun updateLocalIds()
 
     @Query("UPDATE ${Task.TABLE_NAME} SET state = null WHERE state = :state")
     suspend fun updateStates(state: String)

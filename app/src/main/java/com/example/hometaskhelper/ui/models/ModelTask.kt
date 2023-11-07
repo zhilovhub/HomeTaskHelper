@@ -12,10 +12,9 @@ data class ModelTask(
     @ColumnInfo(name = "is_redacting") val isRedacting: Boolean,
     @ColumnInfo(name = "is_finished") val isFinished: Boolean,
     @ColumnInfo(name = "is_deleted") val isDeleted: Boolean,
-    @ColumnInfo(name = "local_id") val localId: Int?,
     @ColumnInfo(name = "state") val state: String?,
 ) {
-    fun toTask(state: String? = null): Task {
+    fun toTask(): Task {
         return Task(
             id = id,
             subjectId = subjectId,
@@ -24,7 +23,6 @@ data class ModelTask(
             isRedacting = isRedacting,
             isFinished = isFinished,
             isDeleted = false,
-            localId = localId,
             state = state
         )
     }

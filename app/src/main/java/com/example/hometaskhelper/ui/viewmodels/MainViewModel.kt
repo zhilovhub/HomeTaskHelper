@@ -33,10 +33,12 @@ class MainViewModel(
     val tasksState: StateFlow<TasksUiState> = _tasksState.asStateFlow()
 
     private var tempTasks = listOf<ModelTask>()
-    private var tempSubjects = mapOf<Int, ModelSubject>()
+    private var tempSubjects = mapOf<Int, ModelSubject>()  // TODO there is a bug, fix later
 
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
+
+    private var accepting: Boolean = false
 
     init {
         coroutineScope.launch {
@@ -81,7 +83,6 @@ class MainViewModel(
             isRedacting = true,
             isFinished = false,
             isDeleted = false,
-            localId = taskId,
             state = null
         )
         _tasksState.update {
@@ -105,7 +106,8 @@ class MainViewModel(
         coroutineScope.launch { repository.cleanDb(state = TASK_SHOULD_CHECK)}
     }
 
-    fun acceptRedacting() {
+    fun acceptRedacting() {  // TODO clear local tasks and collect them again
+        accepting = true
         val getTask = {task: Task ->
             if (task.id < 0) task.copy(id = 0)
             else task
@@ -176,80 +178,73 @@ class MainViewModel(
         }
     }
 
-    fun updateLocalIds() {
-        coroutineScope.launch {
-            repository.updateLocalIds()
-        }
-    }
-
     private fun updateTaskIsRedacting(task: ModelTask) {
         if (!task.isRedacting) {
-            val newTask = task.copy(isRedacting = true)
             coroutineScope.launch {
-                repository.updateTask(newTask.toTask())
-                _tasksState.update {
-                    _tasksState.value.copy(tasks = _tasksState.value.tasks.map { if (it.id == task.id) newTask else it })
-                }
+                repository.updateTask(task.copy(isRedacting = true, state = TASK_SHOULD_UPDATE).toTask())
             }
         }
     }
 
     private fun mergeIncomingChangesWithLocal(incomingTasks: List<ModelTask>): List<ModelTask> {  // TODO transform this func to Network. Now it just for one people
+        if (accepting) {
+            accepting = false
+            return incomingTasks
+        }
+
         val newTasks = _tasksState.value.tasks.toMutableList()
-        val newTasksIndexes = _tasksState.value.tasks.map { it.id }
+        val newTasksIndexes = _tasksState.value.tasks.map { it.id }.toMutableList()
 
         var incomingTask: ModelTask
-        var incomingLocalId: Int?
+        var incomingId: Int
         var incomingTaskState: String?
 
         for (index in incomingTasks.indices) {
             incomingTask = incomingTasks[index]
-            incomingLocalId = incomingTask.localId
+            incomingId = incomingTask.id
             incomingTaskState = incomingTask.state
 
             when (incomingTaskState) {  // Not my task
                 TASK_SHOULD_CHECK -> {
                     if (incomingTask.isDeleted) {  // Delete not my task
-                        newTasks.removeIf { it.id == incomingLocalId }
-                    } else if (newTasksIndexes.contains(incomingLocalId)) {  // Update not my task
+                        newTasks.removeIf { it.id == incomingId }
+                    } else if (newTasksIndexes.contains(incomingId)) {  // Update not my task
                         newTasks.replaceAll {
-                            if (it.id == incomingLocalId)
+                            if (it.id == incomingId)
                                 incomingTask.copy(
                                     isRedacting = false, isDeleted = false, state = null
                                 )
                             else it
                         }
-                    } else if (!newTasksIndexes.contains(incomingLocalId)) {  // Add not my task
+                    } else if (!newTasksIndexes.contains(incomingId)) {  // Add not my task
                         newTasks.add(index, incomingTask.copy(
                             isRedacting = false, isDeleted = false, state = null
                         ))
                     }
                 }
                 TASK_SHOULD_UPDATE -> {  // Should update my task in local
+                    Log.d("HomeScreen", incomingTask.toString())
                     newTasks.replaceAll {
-                        if (it.id == incomingLocalId) incomingTask.copy(
+                        if (it.id == incomingId) it.copy(
+                            subjectId = incomingTask.subjectId,
                             isRedacting = incomingTask.isRedacting,
-                            isDeleted = incomingTask.isDeleted,
                             state = null
                         )
                         else it
                     }
                 }
-                else -> if (!newTasksIndexes.contains(incomingLocalId)) newTasks.add(incomingTask)
+                else -> if (!newTasksIndexes.contains(incomingId)) newTasks.add(incomingTask)
+            }
+            newTasksIndexes.remove(incomingId)
+        }
+
+        for (task in newTasks.toList()) {
+            if (newTasksIndexes.contains(task.id)) {
+                newTasks.remove(task)
             }
         }
-        // TODO add new task that is not mine (state = check)
-        // TODO delete task that is not mine (deleted = 1 and state = check)
-        // TODO if state is check - add or redact these task. This task is not mine
-        // TODO if state is update - update task. This is mine and it defines that task is ready to be updated local
-        // TODO if state is null - nothing to do
-        // TODO clean db (delete deleted = 1 and state = check tasks; set state = null where state = update)
 
-
-        // TODO version 1.0 is finished. Now we need to work with update state.
-        //  When state = update we shouldn't update all fields. Only is_redacting, is_deleting idk for example
-        //  Also we need to send these state to db. In local - only update. Check is on websocket
-        //  Also we need to handle situation when we cancelling. Because tempTasks are not changing. Maybe change tempTasks there too (only with check tasks)
+        tempTasks = newTasks.filter { !it.isRedacting }
 
         return newTasks
     }

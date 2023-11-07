@@ -15,9 +15,6 @@ import com.example.hometaskhelper.data.datasources.database.entities.User
     entities = [Auth::class, Task::class, User::class, Subject::class, OneTimeKey::class],
     version = 15,
     exportSchema = true,
-    autoMigrations = [
-        AutoMigration(from = 14, to = 15, spec = MySpek::class)
-    ]
 )
 abstract class LocalDatabase : RoomDatabase() {
 

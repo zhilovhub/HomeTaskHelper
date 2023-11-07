@@ -2,6 +2,7 @@ package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
@@ -39,6 +40,9 @@ class MainViewModel(
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
     private var accepting: Boolean = false
+
+    private val _hasAuthorized = MutableStateFlow(false)
+    val hasAuthorized: StateFlow<Boolean> = _hasAuthorized.asStateFlow()
 
     init {
         coroutineScope.launch {
@@ -257,7 +261,7 @@ class MainViewModel(
     companion object {
         fun factory(context: Context) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repository = (context.applicationContext as MainApplication).appComponent.repository()
+                val repository = (context as MainApplication).appComponent.repository()
                 return MainViewModel(repository) as T
             }
         }

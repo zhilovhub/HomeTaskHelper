@@ -63,6 +63,12 @@ class MainViewModel(
         }
     }
 
+    fun updateAuthState(newAuthUiState: AuthUiState) {
+        _authState.update {
+            newAuthUiState
+        }
+    }
+
     private fun tempSaveCurrentTasks() {
         tempTasks = _tasksState.value.tasks.toList()
         tempSubjects = _tasksState.value.subjects.toMap()
@@ -279,8 +285,8 @@ data class TasksUiState(
 data class AuthUiState(
     val nickName: String = "",
     val password: String = "",
-    val nickNameState: AuthFieldState = AuthFieldState.DEFAULT,
-    val passwordState: AuthFieldState = AuthFieldState.DEFAULT
+    val nickNameState: AuthFieldState = AuthFieldState.EMPTY,
+    val passwordState: AuthFieldState = AuthFieldState.EMPTY
 )
 
 enum class UserState {
@@ -292,5 +298,5 @@ enum class UserState {
 enum class AuthFieldState {
     SUCCESS,
     ERROR,
-    DEFAULT
+    EMPTY,
 }

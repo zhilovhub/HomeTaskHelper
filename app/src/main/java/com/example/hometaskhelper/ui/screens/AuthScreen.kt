@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hometaskhelper.ui.viewmodels.AuthFieldState
 import com.example.hometaskhelper.ui.viewmodels.MainViewModel
 import com.example.hometaskhelper.ui.viewmodels.UserState
 
@@ -66,12 +67,32 @@ fun AuthScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
                 Column {
-                    Text(
-                        modifier = Modifier.alpha(1f),
-                        text = "Слишком длинный",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red,
-                    )
+                    when (authState.nickNameState) {
+                        AuthFieldState.SUCCESS -> {
+                            Text(
+                                modifier = Modifier.alpha(1f),
+                                text = "Сойдёт",
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF2D9700),
+                            )
+                        }
+                        AuthFieldState.ERROR -> {
+                            Text(
+                                modifier = Modifier.alpha(1f),
+                                text = "Слишком длинный",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red,
+                            )
+                        }
+                        AuthFieldState.EMPTY -> {
+                            Text(
+                                modifier = Modifier.alpha(1f),
+                                text = "Пусто",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red,
+                            )
+                        }
+                    }
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -81,7 +102,31 @@ fun AuthScreen(
                             Text(text = "Имя (придумай)", fontWeight = FontWeight.Bold)
                         },
                         onValueChange = {
-//                            authState.nickName = it
+                            if (!it.contains('\n')) {
+                                if (it.isEmpty()) {
+                                    viewModel.updateAuthState(
+                                        authState.copy(
+                                            nickName = it,
+                                            nickNameState = AuthFieldState.EMPTY
+                                        )
+                                    )
+                                }
+                                else if (it.length > 25) {
+                                    viewModel.updateAuthState(
+                                        authState.copy(
+                                            nickName = if (it.length > 30) authState.nickName else it,
+                                            nickNameState = AuthFieldState.ERROR
+                                        )
+                                    )
+                                } else {
+                                    viewModel.updateAuthState(
+                                        authState.copy(
+                                            nickName = it,
+                                            nickNameState = AuthFieldState.SUCCESS
+                                        )
+                                    )
+                                }
+                            }
                         }
                     )
                 }
@@ -102,7 +147,13 @@ fun AuthScreen(
                         },
                         singleLine = true,
                         onValueChange = {
-//                            if (!it.contains('\n')) password = it
+                            if (!it.contains('\n')) {
+                                viewModel.updateAuthState(
+                                    authState.copy(
+                                        password = it
+                                    )
+                                )
+                            }
                         }
                     )
                 }

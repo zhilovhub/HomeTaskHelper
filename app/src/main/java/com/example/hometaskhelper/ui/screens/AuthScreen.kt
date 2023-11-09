@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,11 +37,10 @@ import com.example.hometaskhelper.ui.viewmodels.UserState
 @Composable
 fun AuthScreen(
     modifier: Modifier = Modifier,
-//    viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(LocalContext.current.applicationContext))
+    viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(LocalContext.current.applicationContext))
 ) {
 
-    var nickName by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    val authState by viewModel.authState.collectAsState()
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -75,12 +76,12 @@ fun AuthScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
-                        value = nickName,
+                        value = authState.nickName,
                         label = {
                             Text(text = "Имя (придумай)", fontWeight = FontWeight.Bold)
                         },
                         onValueChange = {
-                            nickName = it
+//                            authState.nickName = it
                         }
                     )
                 }
@@ -95,12 +96,13 @@ fun AuthScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
-                        value = password,
+                        value = authState.password,
                         label = {
                             Text(text = "Пароль", fontWeight = FontWeight.Bold)
                         },
+                        singleLine = true,
                         onValueChange = {
-                            password = it
+//                            if (!it.contains('\n')) password = it
                         }
                     )
                 }

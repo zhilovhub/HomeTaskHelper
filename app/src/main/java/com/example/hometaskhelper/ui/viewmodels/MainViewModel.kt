@@ -39,6 +39,9 @@ class MainViewModel(
     private val _userState = MutableStateFlow(UserState.DEFAULT)
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
+    private val _authState = MutableStateFlow(AuthUiState())
+    val authState: StateFlow<AuthUiState> = _authState.asStateFlow()
+
     private var accepting: Boolean = false
 
     private val _hasAuthorized = MutableStateFlow(false)
@@ -268,13 +271,26 @@ class MainViewModel(
     }
 }
 
+data class TasksUiState(
+    val tasks: List<ModelTask>,
+    val subjects: Map<Int, ModelSubject>
+)
+
+data class AuthUiState(
+    val nickName: String = "",
+    val password: String = "",
+    val nickNameState: AuthFieldState = AuthFieldState.DEFAULT,
+    val passwordState: AuthFieldState = AuthFieldState.DEFAULT
+)
+
 enum class UserState {
     DEFAULT,
     REDACTING,
     DELETING
 }
 
-data class TasksUiState(
-    val tasks: List<ModelTask>,
-    val subjects: Map<Int, ModelSubject>
-)
+enum class AuthFieldState {
+    SUCCESS,
+    ERROR,
+    DEFAULT
+}

@@ -131,12 +131,30 @@ fun AuthScreen(
                     )
                 }
                 Column {
-                    Text(
-                        modifier = Modifier.alpha(1f),
-                        text = "Слишком длинный",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
+                    when (authState.passwordState) {
+                        AuthFieldState.ERROR -> {
+                            Text(
+                                modifier = Modifier.alpha(1f),
+                                text = "Такого ключа нет",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red,
+                            )
+                        }
+                        AuthFieldState.EMPTY -> {
+                            Text(
+                                modifier = Modifier.alpha(1f),
+                                text = "Пусто",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red,
+                            )
+                        }
+                        else -> {
+                            Text(
+                                modifier = Modifier.alpha(0f),
+                                text = "",
+                            )
+                        }
+                    }
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -148,11 +166,21 @@ fun AuthScreen(
                         singleLine = true,
                         onValueChange = {
                             if (!it.contains('\n')) {
-                                viewModel.updateAuthState(
-                                    authState.copy(
-                                        password = it
+                                if (it.isEmpty()) {
+                                    viewModel.updateAuthState(
+                                        authState.copy(
+                                            password = it,
+                                            passwordState = AuthFieldState.EMPTY
+                                        )
                                     )
-                                )
+                                } else {
+                                    viewModel.updateAuthState(
+                                        authState.copy(
+                                            password = it,
+                                            passwordState = AuthFieldState.SUCCESS
+                                        )
+                                    )
+                                }
                             }
                         }
                     )
@@ -160,7 +188,7 @@ fun AuthScreen(
             }
             Button(
                 onClick = {
-
+                    viewModel.auth()
                 }
             ) {
                 Text(

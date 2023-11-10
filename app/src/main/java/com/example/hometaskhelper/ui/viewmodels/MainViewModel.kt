@@ -63,6 +63,12 @@ class MainViewModel(
         }
     }
 
+    fun auth() {
+        _authState.update {
+            _authState.value.copy(passwordState = AuthFieldState.ERROR)
+        }
+    }
+
     fun updateAuthState(newAuthUiState: AuthUiState) {
         _authState.update {
             newAuthUiState

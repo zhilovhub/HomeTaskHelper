@@ -2,13 +2,11 @@ package com.example.hometaskhelper.ui.viewmodels
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.hometaskhelper.MainApplication
 import com.example.hometaskhelper.TASK_SHOULD_CHECK
 import com.example.hometaskhelper.TASK_SHOULD_UPDATE
-import com.example.hometaskhelper.data.datasources.database.entities.Subject
 import com.example.hometaskhelper.data.datasources.database.entities.Task
 import com.example.hometaskhelper.data.repositories.AppRepository
 import com.example.hometaskhelper.ui.models.ModelSubject
@@ -16,6 +14,7 @@ import com.example.hometaskhelper.ui.models.ModelTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +24,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel(
-    private val repository: AppRepository
+    private val repository: AppRepository,
+    private val password: String?
 ) : ViewModel() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -44,7 +44,7 @@ class MainViewModel(
 
     private var accepting: Boolean = false
 
-    private val _hasAuthorized = MutableStateFlow(false)
+    private val _hasAuthorized = MutableStateFlow(password != null)
     val hasAuthorized: StateFlow<Boolean> = _hasAuthorized.asStateFlow()
 
     init {
@@ -63,9 +63,15 @@ class MainViewModel(
         }
     }
 
-    fun auth() {
-        _authState.update {
-            _authState.value.copy(passwordState = AuthFieldState.ERROR)
+    fun auth(): Boolean {
+        return if (_authState.value.password == "1111" && _authState.value.nickNameState == AuthFieldState.SUCCESS) {
+            _hasAuthorized.update { true }
+            true
+        } else {
+            _authState.update {
+                _authState.value.copy(passwordState = if (_authState.value.password.isNotEmpty()) AuthFieldState.ERROR else AuthFieldState.EMPTY)
+            }
+            false
         }
     }
 
@@ -277,7 +283,8 @@ class MainViewModel(
         fun factory(context: Context) = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val repository = (context as MainApplication).appComponent.repository()
-                return MainViewModel(repository) as T
+                val password = context.getSharedPreferences("password", Context.MODE_PRIVATE).getString("password", null)
+                return MainViewModel(repository, password) as T
             }
         }
     }

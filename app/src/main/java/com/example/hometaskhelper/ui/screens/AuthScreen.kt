@@ -1,5 +1,6 @@
 package com.example.hometaskhelper.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ fun AuthScreen(
 ) {
 
     val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current.applicationContext
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -188,7 +190,13 @@ fun AuthScreen(
             }
             Button(
                 onClick = {
-                    viewModel.auth()
+                    val isSuccess = viewModel.auth()
+                    if (isSuccess) {
+                        val sharedPreferences = context.getSharedPreferences("password", Context.MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putString("password", authState.password)
+                        editor.apply()
+                    }
                 }
             ) {
                 Text(

@@ -4,7 +4,6 @@ import android.app.Application
 import com.example.hometaskhelper.di.AppComponent
 import com.example.hometaskhelper.di.DaggerAppComponent
 import com.example.hometaskhelper.di.DatabaseModule
-import com.example.hometaskhelper.di.RepositoryModule
 
 class MainApplication : Application() {
 

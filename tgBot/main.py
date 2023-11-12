@@ -1,60 +1,55 @@
-from cfg import TOKEN,WEBHOOK_PATH,WEBHOOK_SECRET,WEB_SERVER_HOST,WEB_SERVER_PORT,BASE_WEBHOOK_URL,SSL_PEM,SSL_KEY
-from handlers import r
-import dbWorker
+from cfg import *
+from handlers import r as router
 import asyncio
 import platform
 from aiohttp import web
 import logging
-import ssl
 from aiogram import Bot, Dispatcher
+from aiogram.types.input_file import FSInputFile
 from aiogram.webhook.aiohttp_server import *
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import FSInputFile
+from aiogram.enums import ParseMode
+import sys
 
 
 async def dropWebhook(bot):
-    await bot.delete_webhook(drop_pending_updates=True)
+    await bot.delete_webhook()
 
 
-async def makeWebhook(bot):
-    await dropWebhook(bot)
-    await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}",certificate=FSInputFile(SSL_PEM),secret_token=WEBHOOK_SECRET)
+async def setWebhook(bot):
+    await bot.dropWebhook()
+    await bot.set_webhook(url = WEBHOOK_URL + WEBHOOK_PATH, drop_pending_updates = True, certificate=FSInputFile(SSL_CERT))
 
 
-def setupWebApp(bot,dp):
-    dp.startup.register(makeWebhook)
+def main() -> None:
+    bot, dp = prepBot()
     app = web.Application()
-    webhookRequestHandler = SimpleRequestHandler(bot,dp,WEBHOOK_SECRET)
-    webhookRequestHandler.register(app, path=WEBHOOK_PATH)
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dp,
+        bot=bot,
+        secret_token=WEBHOOK_SECRET,
+    )
+    webhook_requests_handler.register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
-    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-    context.load_cert_chain(SSL_PEM, SSL_KEY)
-    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT,ssl_context=context)
-
-
-def setupBot():
-    bot = Bot(TOKEN)
-    dp = Dispatcher(storage=MemoryStorage())
-    dp.include_router(r)
-    return bot,dp
+    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 
 async def main_poll():
-    bot,dp = setupBot()
-    await startBot(bot,dp)
-
-def main_webhook():
-    bot, dp = setupBot()
-    setupWebApp(bot, dp)
-
-async def startBot(bot,dp):
+    bot,dp = prepBot()
     await dropWebhook(bot)
-    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    await dp.start_polling(bot)
 
 
-if __name__=="__main__":
-    logging.basicConfig(level=logging.INFO)
-    if platform.system() in ["Darwin", "Windows"]:
+def prepBot():
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.include_router(router)
+    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    return bot,dp
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    if platform.system() in ('Darwin','Windows'):
         asyncio.run(main_poll())
     else:
-        asyncio.run(main_webhook())
+        main()

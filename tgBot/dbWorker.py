@@ -108,7 +108,7 @@ class dataBaseWorker():
         h = keyGen.getHash(key)
         base, cur = self.connectBase()
         cur.execute("SELECT key_value FROM OneTimeKeys")
-        l = [i[0] for i in cur.fetchall()] # -> list[str] - hashes
+        l = [i[0] for i in cur.fetchall()] # -> [str] - hashes
         cur.close(); base.close()
         isValid = True if h in l else False
         logging.log(20,"Verified OneTimeKey")
@@ -183,7 +183,7 @@ class dataBaseWorker():
         logging.log(20,"Subject deleted")
 
 
-    def getSubjectsAliases(self) -> list [str]:
+    def getSubjectsAliases(self) ->  [str]:
         base, cur = self.connectBase()
         cur.execute("SELECT aliases FROM Subjects")#[json([str]),]
         raw_subs = cur.fetchall()
@@ -195,7 +195,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectNamesAndIDs(self) -> list [(int, str)]:
+    def getSubjectNamesAndIDs(self) ->  [(int, str)]:
         base, cur = self.connectBase()
         cur.execute("SELECT id, subject_name FROM Subjects")
         l = cur.fetchall()
@@ -212,7 +212,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getSubjectIDsAndAliases(self) -> list [[int,[str]]]:
+    def getSubjectIDsAndAliases(self) ->  [[int,[str]]]:
         base, cur = self.connectBase()
         cur.execute("SELECT id,aliases FROM Subjects")
         subs = cur.fetchall()
@@ -221,7 +221,7 @@ class dataBaseWorker():
         return subs
 
 
-    def getTasks(self, user_name: str) -> list [(int, str)]: 
+    def getTasks(self, user_name: str) ->  [(int, str)]:
         base, cur = self.connectBase()
         cur.execute("SELECT finished_tasks FROM Users WHERE user_name = %s", (user_name,))
         complete = json.loads(cur.fetchone()[0])
@@ -280,7 +280,7 @@ class dataBaseWorker():
         return 0
 
 
-    def getUsers(self) -> list[int]:
+    def getUsers(self) -> [int]:
         base, cur = self.connectBase()
         cur.execute("SELECT tg_id FROM Auth")
         data = [i[0] for i in cur.fetchall()]

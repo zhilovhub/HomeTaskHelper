@@ -25,7 +25,7 @@ class dataBaseWorker():
             base = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=self.dbPath)
             cur = base.cursor()
         except Error as e:
-            logging.log(20,"Trying to connect to db again")
+            logging.log(20,"Trying to connect to db again",e)
             time.sleep(5)
             self.connectBase()
         return base,cur

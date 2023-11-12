@@ -25,7 +25,7 @@ def prepareAlias(line:str): # -> list[str]
 
 
 def isAliasStringValid(line:str): # -> boolean
-    return re.fullmatch(".+,.+",line)
+    return re.fullmatch(".+,.+",line)!=None
 
 
 def prepareSub(line:str):
@@ -35,11 +35,11 @@ def prepareSub(line:str):
 
 
 def isUserNameValid(line:str): # -> boolean
-    return re.fullmatch(r"[\w\d]{4,64}",line)
+    return re.fullmatch(r"[\w\d\-\_]{4,64}",line)!=None
 
 
 def isPasswordValid(line:str): # -> boolean
-    return re.fullmatch(r".{8,1024}", line)
+    return re.fullmatch(r".{8,1024}", line)!=None
 
 def isDateValid(line:str): # -> boolean
-    return re.fullmatch(r"((0\d)|(1\d)|(2\d)|(3[01]))\.((0\d)|(1[012]))", line)
+    return re.fullmatch(r"((0\d)|(1\d)|(2\d)|(3[01]))\.((0\d)|(1[012]))", line)!=None

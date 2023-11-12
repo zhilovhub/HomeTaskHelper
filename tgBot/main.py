@@ -5,6 +5,7 @@ import platform
 from aiohttp import web
 import logging
 from aiogram import Bot, Dispatcher
+from aiogram.types.input_file import FSInputFile
 from aiogram.webhook.aiohttp_server import *
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
@@ -17,7 +18,7 @@ async def dropWebhook(bot):
 
 async def setWebhook(bot):
     await bot.dropWebhook()
-    await bot.set_webhook(url = WEBHOOK_URL + WEBHOOK_PATH, drop_pending_updates = True)
+    await bot.set_webhook(url = WEBHOOK_URL + WEBHOOK_PATH, drop_pending_updates = True, certificate=FSInputFile(SSL_CERT))
 
 
 def main() -> None:

@@ -203,7 +203,7 @@ class dataBaseWorker():
         return l
 
 
-    def getSubjectNamesAndAliases(self) -> list [(str, json([str]))]:
+    def getSubjectNamesAndAliases(self) -> [(str, json)]:
         base, cur = self.connectBase()
         cur.execute("SELECT subject_name, aliases FROM Subjects")
         subs = cur.fetchall()

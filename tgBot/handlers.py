@@ -5,7 +5,6 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 import dbWorker
 from aiogram.fsm.state import StatesGroup, State
-import re
 from cfg import DB_PATH
 import matcher
 import json
@@ -52,19 +51,25 @@ class AddAlias(StatesGroup):
 #-------------------MISC-------------------
 @r.message(Command("start"))
 async def start(message: types.Message, state: FSMContext):
-    await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register")
+    await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register, для отмены действия /cancel")
 
 
 @r.message(Command("help"))
 async def help(message: types.Message, state: FSMContext):
     await message.answer("""
     Расскажу коротко обо всех доступных тебе командах😁
+    
+    Предметы
     /newsub (название предмета) - добавляет новый предмет для тебя и твоей группы🥲
     /delsub - показывает меню, выбрав элемент которого будет удален соответствующий предмет
     /addalias - добавляет синоним для предмета, чтобы ты мог написать как линал, так и линейка или ЛиНеЙнАя АлГеБра🤓
-    /listtasks - показывает всю домашку
     /listsubs - показывает предметы
+    
+    Задачи
     /deltask - показывает меню, выбрав элемент которого будет удалено соответствующее задание
+    /edittask - позволяет изменить существующее задание
+    /setcomplete - отмечает задачу, как выполненную
+    /listtasks - показывает всю домашку
     /cancel - отменяет текущее действие
     
     
@@ -88,6 +93,7 @@ async def registerNewUser(message: types.Message, state: FSMContext):
     await state.clear()
     if db.isUserTG(message.chat.id):
         await message.answer("Вы уже авторизованы😌")
+        await help(message, state)
         return
     await message.answer("Введите ключ доступа для продолжения работы🙃\nНапишите /login,если у вас уже есть учетная запись")
     await state.set_state(Register.waitingForKey)
@@ -100,7 +106,7 @@ async def verifyKey(message: types.Message, state: FSMContext):
     else:
         await state.update_data(usedKey = message.text)
         await message.answer("Введите имя пользователя"
-                      "\nНапример: NaGiBaTor228"
+                      "\nНапример: Adskiy_Botan"
                       "\nНе используйте спецсимволы и пробелы"
                       "\nДлина до 64 символов")
         await state.set_state(Register.waitingForUserName)
@@ -112,7 +118,7 @@ async def setUpUserName(message: types.Message, state: FSMContext):
         await message.answer("Имя пользователя не соответствует требованиям☹️")
         return
     await state.update_data(userName = message.text)
-    await message.answer("Придумайте сложный пароль🤓")
+    await message.answer("Придумайте сложный пароль (не менее 8 символов)🤓")
     await state.set_state(Register.waitingForPassword)
 
 
@@ -128,6 +134,7 @@ async def setUpPassword(message: types.Message, state: FSMContext):
     global users
     users.append(message.chat.id)
     await message.answer("Регистрация прошла успешно😎")
+    await help(message, state)
     await state.clear()
 #------------------END------------------
 
@@ -140,6 +147,7 @@ async def login(message: types.Message, state: FSMContext):
     await state.clear()
     if db.isUserTG(message.chat.id):
         await message.answer("Вы уже авторизованы")
+        await help(message, state)
         return
     await message.answer("Введите логин")
     await state.set_state(Login.waitingForLogin)
@@ -164,6 +172,7 @@ async def parsePassword(message: types.Message, state: FSMContext):
     db.addTelegramToExisting(message.chat.id,userData["userName"])
     await message.delete()
     await message.answer("Авторизация прошла успешно🙃")
+    await help(message, state)
     await state.clear()
     return
 #------------------END------------------

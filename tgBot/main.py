@@ -1,4 +1,4 @@
-from cfg import TOKEN,WEBHOOK_PATH,WEBHOOK_SECRET,WEB_SERVER_HOST,WEB_SERVER_PORT
+from cfg import *
 from handlers import r as router
 import asyncio
 import platform
@@ -10,10 +10,18 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 import sys
 
+
+async def dropWebhook(bot):
+    await bot.delete_webhook()
+
+
+async def setWebhook(bot):
+    await bot.dropWebhook()
+    await bot.set_webhook(url = WEBHOOK_URL + WEBHOOK_PATH, drop_pending_updates = True)
+
+
 def main() -> None:
-    dp = Dispatcher(storage=MemoryStorage())
-    dp.include_router(router)
-    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    bot, dp = prepBot()
     app = web.Application()
     webhook_requests_handler = SimpleRequestHandler(
         dispatcher=dp,
@@ -25,6 +33,22 @@ def main() -> None:
     web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 
+async def main_poll():
+    bot,dp = prepBot()
+    await dropWebhook(bot)
+    await dp.start_polling(bot)
+
+
+def prepBot():
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.include_router(router)
+    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    return bot,dp
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    main()
+    if platform.system() in ('Darwin','Windows'):
+        asyncio.run(main_poll())
+    else:
+        main()

@@ -88,7 +88,6 @@ async def sendNotification(data: types.CallbackQuery, state: FSMContext):
 async def start(message: types.Message, state: FSMContext):
     await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register, для отмены действия /cancel")
 
-
 @r.message(Command("help"))
 async def help(message: types.Message, state: FSMContext):
     await message.answer("""
@@ -120,15 +119,17 @@ async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Текущее действие отменено🗑️")
     return
-
+  
 
 @r.callback_query(F.data.startswith("CANCEL"))
 async def cancelKB(data: types.CallbackQuery, state: FSMContext):
     await data.message.edit_text("Действие отменено")
     await state.clear()
+#------------------END------------------
 
 
 
+    
 #------------------REGISTATION------------------
 @r.message(Command("register"))
 async def registerNewUser(message: types.Message, state: FSMContext):
@@ -331,8 +332,6 @@ async def MarkAsComplete(data: types.CallbackQuery, state: FSMContext):
     db.markAsComplete(taskID, db.getUserNameByTGID(data.from_user.id))
     await data.message.delete()
     await data.message.answer("Молодец, задание вычеркнуто из списка дел✍️")
-
-
 #------------------END------------------
 
 
@@ -396,7 +395,7 @@ async def delSubject(data:types.CallbackQuery):
 async def startAddAlias(message: types.Message, state: FSMContext):
     await message.answer("Отправь мне название предмета, для которого ты хочешь добавить синоним,\nИ сам синоним в одном сообщении (через запятую)🤯")
     await state.set_state(AddAlias.waitingForSubjectNAlias)
-
+#------------------END------------------
 
 @r.message(Command("listsubs"),F.from_user.id.in_(users))
 async def listsubs(message: types.Message, state: FSMContext):

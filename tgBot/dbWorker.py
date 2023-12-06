@@ -25,7 +25,7 @@ class dataBaseWorker():
             base = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=self.dbPath)
             cur = base.cursor()
         except Error as e:
-            logging.log(20,"Trying to connect to db again")
+            logging.log(20,"Trying to connect to db again",e)
             time.sleep(5)
             self.connectBase()
         return base,cur
@@ -168,6 +168,10 @@ class dataBaseWorker():
         logging.log(20,"Marked task as complete")
 
 
+    def isSubjectExists(self,subject_name: str) -> bool:
+        return subject_name.lower() in self.getSubjectsAliases()
+
+
     def addSub(self,name) -> None:
         base, cur = self.connectBase()
         name = name.lower()
@@ -266,7 +270,7 @@ class dataBaseWorker():
         logging.log(20,"Added new Alias")
 
 
-    def aliasIsValid(self, subject_name, alias) -> (0,1,2): #-> 0,1,2 : 0-is valid, 1-subject_name not found, 2-alias already exists
+    def isAliasValid(self, subject_name, alias) -> (0, 1, 2): #-> 0,1,2 : 0-is valid, 1-subject_name not found, 2-alias already exists
         base, cur = self.connectBase()
         subject_name, alias = subject_name.lower(), alias.lower()
         cur.execute("SELECT aliases FROM Subjects")  # [json([str]),]
@@ -296,13 +300,21 @@ class dataBaseWorker():
         return userName
 
 
+    def getUserIDS(self):
+        base, cur = self.connectBase()
+        cur.execute("SELECT tg_id FROM Auth")
+        res = [i[0] for i in cur.fetchall()]
+        cur.close();base.close()
+        return res
+
+
 def getInput():
     return input("""Enter a number
-                    0 - generate one time keys
-                    1 - regenerate db
-                    2 - get users
-                    3 - exit\n
-                    """)
+    0 - generate one time keys
+    1 - regenerate db
+    2 - get users
+    3 - exit\n
+    """)
 
 if __name__ == "__main__":
     db = dataBaseWorker(DB_PATH)

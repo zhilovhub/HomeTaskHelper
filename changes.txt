@@ -13,3 +13,9 @@ TGbot release
 Fully working version includes next functionality:
 1. Proper Login&Registration, unregistered users now can't use bot
 2. All subject&task addition/deletion/redaction is fully working
+
+TGbot update 1
+1.new task regexes fixed
+2.More info about occured errors when adding a new task
+3.Notifications added
+4.Minor refactor

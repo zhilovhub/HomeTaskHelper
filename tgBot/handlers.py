@@ -13,6 +13,7 @@ db = dbWorker.dataBaseWorker(DB_PATH)
 logging.basicConfig(level=logging.INFO)
 users = db.getUsers()
 
+
 class Register(StatesGroup):
     waitingForKey = State()
     waitingForUserName = State()
@@ -48,7 +49,41 @@ class AddAlias(StatesGroup):
     waitingForAlias = State()
 
 
+class Notify(StatesGroup):
+    waitingForMessage = State()
+
+
 #-------------------MISC-------------------
+@r.message(Command("notify"),F.from_user.id==799100592)
+async def notifyAll(message: types.Message, state: FSMContext):
+    await message.answer("Отправь сообщение для всех")
+    await state.set_state(Notify.waitingForMessage)
+
+
+@r.message(Notify.waitingForMessage)
+async def notify(message: types.Message, state: FSMContext):
+    await state.update_data(msg = message.text)
+    buttons = [[types.InlineKeyboardButton(text = "Подтвердить",callback_data="ACCEPTNOTIFICATION 0"),
+               types.InlineKeyboardButton(text = "Отменить",callback_data="CANCEL"),
+               types.InlineKeyboardButton(text = "Изменить",callback_data="ACCEPTNOTIFICATION 1")]]
+    kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    await message.answer(message.text, reply_markup=kb)
+
+
+@r.callback_query(F.data.startswith("ACCEPTNOTIFICATION"))
+async def sendNotification(data: types.CallbackQuery, state: FSMContext):
+    mode = int(data.data.split()[1])
+    user_data = await state.get_data()
+    msg = user_data["msg"]
+    if mode == 0:
+        await data.message.edit_text("Сообщение отправлено")
+        for chat_id in db.getUserIDS():
+            await data.bot.send_message(chat_id, msg)
+        return
+    await data.message.delete()
+    await notifyAll(data.message, state)
+
+
 @r.message(Command("start"))
 async def start(message: types.Message, state: FSMContext):
     await message.answer("Привет, если у тебя уже есть учетная запись, напиши /login, иначе /register, для отмены действия /cancel")
@@ -84,11 +119,17 @@ async def cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Текущее действие отменено🗑️")
     return
+  
+
+@r.callback_query(F.data.startswith("CANCEL"))
+async def cancelKB(data: types.CallbackQuery, state: FSMContext):
+    await data.message.edit_text("Действие отменено")
+    await state.clear()
 #------------------END------------------
 
 
-  
-  
+
+    
 #------------------REGISTATION------------------
 @r.message(Command("register"))
 async def registerNewUser(message: types.Message, state: FSMContext):
@@ -185,19 +226,30 @@ async def parsePassword(message: types.Message, state: FSMContext):
 #------------------Task------------------
 @r.message(F.text.lower().startswith("добавь"),F.from_user.id.in_(users))
 async def addTask(message: types.Message, state: FSMContext):
-    if matcher.isTaskValid(message.text, db):
-        subject,date,description = matcher.prepareTask(message.text)
-        if matcher.isSubjectExists(subject, db):
-            db.addTask(subject,date,description)
-            await message.answer(f"На {date} число по предмету {subject} добавлено задание {description}")
-            return
-    await message.answer("Ты неверно описал задание или предмета не существует, формат:\nДобавь (Название предмета) на (дата вида 00.00) (описание задания)")
+    res = matcher.prepareTask(message.text)
+    if res[0]==None:
+        await message.answer("Предмет не указан или указан неверно")
+        return
+    elif res[1]==None:
+        await message.answer("Дата не указана или указана неверно")
+        return
+    elif res[2]==None:
+        await message.answer("Нет описания задачи")
+        return
+    elif not db.isSubjectExists(res[0].group().capitalize()):
+        await message.answer("Такого предмета нет")
+        return
+    subject,date,description = res[0].group().capitalize(), res[1].group(), res[2].group().capitalize()
+    db.addTask(subject,date,description)
+    await message.answer(f"На {date} число по предмету {subject} добавлено задание {description}")
+    return
 
 
 @r.message(Command("deltask"),F.from_user.id.in_(users))
 async def prepToDelTask(message: types.Message, state: FSMContext):
     tasks = db.getTasks(db.getUserNameByTGID(message.from_user.id))
     buttons = [[types.InlineKeyboardButton(text = i[1],callback_data=f"DT {i[0]}")] for i in tasks]
+    buttons+= [[types.InlineKeyboardButton(text = "Отмена", callback_data="CANCEL")]]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     if len(tasks)!=0: await message.answer("Выбери задание для удаления",reply_markup=kb)
     else: await message.answer("Заданий нет😁")
@@ -206,7 +258,6 @@ async def prepToDelTask(message: types.Message, state: FSMContext):
 @r.callback_query(F.data.startswith("DT"))
 async def delTask(data: types.CallbackQuery):
     taskID = int(data.data.split()[1])
-    print(taskID)
     db.delTask(taskID)
     await data.message.edit_text("Задание удалено😎")
 
@@ -221,6 +272,7 @@ async def displayTasks(message: types.Message, state: FSMContext):
 async def prepToEditTask(message: types.Message, state: FSMContext):
     tasks = db.getTasks(db.getUserNameByTGID(message.from_user.id))
     buttons = [[types.InlineKeyboardButton(text=i[1], callback_data=f"ETST {i[0]}")] for i in tasks]
+    buttons += [[types.InlineKeyboardButton(text="Отмена", callback_data="CANCEL")]]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     if len(tasks)!=0: await message.answer("Выбери задание для изменения😶",reply_markup=kb)
     else: await message.answer("Нечего редактировать, все выполнено!🥳")
@@ -230,6 +282,7 @@ async def prepToEditTask(message: types.Message, state: FSMContext):
 async def editTask(data: types.CallbackQuery, state: FSMContext):
     ID = int(data.data.split()[1])
     buttons = [[types.InlineKeyboardButton(text = i, callback_data = f"ETET {a}")] for a,i in enumerate(["описание","дата"])]
+    buttons += [[types.InlineKeyboardButton(text="Отмена",callback_data="CANCEL")]]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     await data.message.delete()
     await state.update_data(taskID = ID)
@@ -250,7 +303,6 @@ async def selectEditingParameter(data: types.CallbackQuery, state: FSMContext):
 @r.message(EditTask.waitingForDescription)
 async def editTaskDescription(message: types.Message, state: FSMContext):
     userData = await state.get_data()
-    print(userData)
     db.updateTask(task_id = userData["taskID"],description=message.text.capitalize())
     await message.answer("Задание обновлено")
     await state.clear()
@@ -270,6 +322,7 @@ async def editTaskDate(message: types.Message, state: FSMContext):
 async def prepToMarkAsComplete(message: types.Message, state: FSMContext):
     tasks = db.getTasks(db.getUserNameByTGID(message.from_user.id))
     buttons = [[types.InlineKeyboardButton(text=x[1], callback_data=f"MC {x[0]}")] for x in tasks]
+    buttons += [[types.InlineKeyboardButton(text="Отмена",callback_data="CANCEL")]]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     await message.answer("Выбери задание, которое нужно отметить как выполненное",reply_markup=kb)
 
@@ -310,6 +363,7 @@ async def addSubjectByName(message: types.Message, state: FSMContext):
 async def prepToDelSubject(message: types.Message, state: FSMContext):
     subjects = db.getSubjectNamesAndIDs()
     buttons = [[types.InlineKeyboardButton(text = i[1], callback_data=f"DS {i[0]}")] for i in subjects]
+    buttons += [[types.InlineKeyboardButton(text="Отмена", callback_data="CANCEL")]]
     kb = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     await message.answer("Выбери предмет для удаления🫠",reply_markup=kb)
 
@@ -320,8 +374,7 @@ async def addAlias(message: types.Message, state: FSMContext):
         await message.answer("Название предмета и синоним надо писать через запятую в одном сообщении🤡")
         return
     subject_name, alias = matcher.prepareAlias(message.text)
-    print(subject_name, alias)
-    reply = db.aliasIsValid(subject_name,alias)
+    reply = db.isAliasValid(subject_name, alias)
     if reply==0:
         db.addAlias(subject_name,alias)
         await message.answer(f"Добавлен синоним {alias} для предмета {subject_name}")
@@ -348,7 +401,4 @@ async def startAddAlias(message: types.Message, state: FSMContext):
 async def listsubs(message: types.Message, state: FSMContext):
     subs = db.getSubjectNamesAndAliases()
     l = '\n'.join([f"{i[0].capitalize()} aka " + ', '.join(json.loads(i[1])) for i in subs])
-    print(l)
     await message.answer(l)
-
-

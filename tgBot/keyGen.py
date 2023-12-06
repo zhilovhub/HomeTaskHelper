@@ -7,7 +7,7 @@ alph = digits+ascii_uppercase+ascii_lowercase
 logging.basicConfig(level=logging.INFO)
 
 
-def generateKeys(n: int): # -> list[str] - hashes
+def generateKeys(n: int) -> [str]:# - hashes
     hl = []; kl = []
     for i in range(n):
         val = "".join([alph[random.randint(0,26+26+9)] for x in range(256)])
